@@ -5,7 +5,7 @@
  * @return {Boolean}
  */
 var toBoolean = function (value) {
-  return value !== false && value !== '' && value !== 'false' && value !== '0';
+  return [0, false, '', '0', 'false'].indexOf(value) === -1;
 };
 
 /**

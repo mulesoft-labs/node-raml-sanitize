@@ -64,7 +64,7 @@ Only valid integers and valid JavaScript numbers will sanitize. Any invalid inte
 
 #### Booleans
 
-Only `false`, `"false"`, `"0"` and `""` will return `false`. Everything else is considered `true`.
+Only `false`, `0`, `"false"`, `"0"` and `""` will return `false`. Everything else is considered `true`.
 
 #### Dates
 
