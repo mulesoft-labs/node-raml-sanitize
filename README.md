@@ -1,0 +1,75 @@
+# RAML Sanitize
+
+Strict sanitization of [RAML parameters](https://github.com/raml-org/raml-spec/blob/master/raml-0.8.md#named-parameters) into correct values and types. Allows for types to be plugged in dynamically.
+
+## Why?
+
+This module sanitizes values using the RAML parameter syntax. You should use this if you need to convert any request parameters (usually strings) into the corresponding JavaScript types. For example, form request bodies, query parameters and headers all have no concept of types. After running sanitization, you can use [raml-validate](https://github.com/blakeembrey/raml-validate) to validate the strict values.
+
+## Installation
+
+```shell
+npm install raml-sanitize --save
+```
+
+## Usage
+
+The module exports a function that needs to be invoked to get a sanitization instance.
+
+```javascript
+var sanitize = require('raml-sanitize')();
+
+var user = sanitize({
+  username: {
+    type: 'string'
+  },
+  password: {
+    type: 'string'
+  },
+  birthday: {
+    type: 'date'
+  },
+
+});
+
+user({
+  username: 'blakeembrey',
+  password: 'hunter2',
+  birthday: 'Mon, 23 Jun 2014 01:19:34 GMT'
+});
+// => { username: 'blakeembrey', password: 'hunter2', birthday: new Date() }
+```
+
+### Type sanitization
+
+The module comes with built-in type sanitization of all [RAML parameters](https://github.com/raml-org/raml-spec/blob/master/raml-0.8.md#named-parameters) - `string`, `number`, `integer`, `date` and `boolean`. To add a new type sanitization, add a new property with the corresponding name to the `sanitize.TYPES` object.
+
+### Rule sanitization
+
+The module can be extended with rule sanitization by adding properties to the `sanitize.RULES` object.
+
+### Caveats
+
+#### Empty Values
+
+Any empty values (`null` and `undefined`) will be returned.
+
+#### Numbers
+
+Only valid JavaScript numbers will be correctly sanitized. Any invalid or infinite number will return `NaN`.
+
+#### Integers
+
+Only valid integers and valid JavaScript numbers will sanitize. Any invalid integer or infinite number will return `NaN`.
+
+#### Booleans
+
+Only `false`, `"false"`, `"0"` and `""` will return `false`. Everything else is considered `true`.
+
+#### Dates
+
+Date sanitization will always return a date object. In the case of an invalid date, you will receive an invalid date object.
+
+## License
+
+MIT
