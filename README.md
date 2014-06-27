@@ -27,15 +27,14 @@ var user = sanitize({
     type: 'string'
   },
   birthday: {
-    type: 'date'
-  },
-
+    type: 'date',
+    default: new Date()
+  }
 });
 
 user({
   username: 'blakeembrey',
-  password: 'hunter2',
-  birthday: 'Mon, 23 Jun 2014 01:19:34 GMT'
+  password: 'hunter2'
 });
 // => { username: 'blakeembrey', password: 'hunter2', birthday: new Date() }
 ```
@@ -46,7 +45,19 @@ The module comes with built-in type sanitization of all [RAML parameters](https:
 
 ### Rule sanitization
 
-The module can be extended with rule sanitization by adding properties to the `sanitize.RULES` object.
+The module can be extended with rule sanitization by adding properties to the `sanitize.RULES` object. A few core rules are implemented by default and can not be overriden - `repeat`, `default` and `type`.
+
+#### Empty values
+
+Empty values are automatically allowed to pass through sanitization. The only values considered to be empty are `undefined` and `null`.
+
+#### Default values
+
+When the value is empty and a `default` value has been provided, it will return the default value instead.
+
+#### Repeated values
+
+When the repeat flag is set to `true`, the return value will always be an array. If the value is not an array, it will be wrapped in an array. If the value is empty, an empty array will be returned.
 
 ### Caveats
 

@@ -63,10 +63,10 @@ var toSanitization = function (config, rules, types) {
   // Iterate over the schema configuration and push sanitization functions into
   // the sanitization array.
   Object.keys(config).filter(function (rule) {
-    return rule !== 'type' && rule !== 'repeat';
+    return rule !== 'type' && rule !== 'repeat' && rule !== 'default';
   }).forEach(function (rule) {
     if (typeof rules[rule] === 'function') {
-      fns.push(rules[rule](config[rule], rule));
+      fns.push(rules[rule](config[rule], rule, config));
     }
   });
 
@@ -95,22 +95,28 @@ var toSanitization = function (config, rules, types) {
    * @param  {Object} object
    * @return {*}
    */
-  return function (value, key, object) {
+  return function sanitization (value, key, object) {
+    // Immediately return empty values with attempting to sanitize.
+    if (value == null) {
+      // Fallback to providing the default value instead.
+      if (config.default != null) {
+        return sanitization(config.default, key, object);
+      }
+
+      // Return an empty array for repeatable values.
+      return config.repeat ? [] : value;
+    }
+
     // Support repeated parameters as arrays.
     if (config.repeat) {
       // Convert the value into array when needed.
       if (!Array.isArray(value)) {
-        value = value == null ? [] : [value];
+        value = [value];
       }
 
       return value.map(function (value) {
         return sanitize(value, key, object);
       });
-    }
-
-    // Immediately return empty values with attempting to sanitize.
-    if (value == null) {
-      return value;
     }
 
     return sanitize(value, key, object);

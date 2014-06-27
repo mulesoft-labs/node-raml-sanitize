@@ -288,6 +288,44 @@ var TESTS = [
     { param: ['abc123'] }
   ],
   /**
+   * Default value sanitization.
+   */
+  [
+    {
+      param: { type: 'string', default: 'test' }
+    },
+    { param: 'abc' },
+    { param: 'abc' }
+  ],
+  [
+    {
+      param: { type: 'string', default: 'test' }
+    },
+    { param: null },
+    { param: 'test' }
+  ],
+  [
+    {
+      param: { type: 'string', default: 'test', repeat: true }
+    },
+    { param: null },
+    { param: ['test'] }
+  ],
+  [
+    {
+      param: { type: 'integer', default: 123 }
+    },
+    { param: null },
+    { param: 123 }
+  ],
+  [
+    {
+      param: { type: 'integer', default: '123', repeat: true }
+    },
+    { param: null },
+    { param: [123] }
+  ],
+  /**
    * Multiple sanitizations.
    */
   [
