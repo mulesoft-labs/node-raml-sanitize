@@ -83,4 +83,4 @@ Date sanitization will always return a date object. In the case of an invalid da
 
 ## License
 
-MIT
+Apache 2.0

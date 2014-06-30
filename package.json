@@ -8,23 +8,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/blakeembrey/raml-sanitize.git"
+    "url": "git://github.com/mulesoft/raml-sanitize.git"
   },
   "keywords": [
     "raml",
     "schema",
     "validation"
   ],
-  "author": {
-    "name": "Blake Embrey",
-    "email": "hello@blakeembrey.com",
-    "url": "http://blakeembrey.me"
-  },
+  "author": "MuleSoft, Inc.",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/blakeembrey/raml-sanitize/issues"
+    "url": "https://github.com/mulesoft/raml-sanitize/issues"
   },
-  "homepage": "https://github.com/blakeembrey/raml-sanitize",
+  "homepage": "https://github.com/mulesoft/raml-sanitize",
   "devDependencies": {
     "chai": "^1.9.1",
     "istanbul": "^0.2.11",
