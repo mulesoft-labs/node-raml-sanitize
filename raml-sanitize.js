@@ -27,11 +27,7 @@ var toNumber = function (value) {
  * @return {Number}
  */
 var toInteger = function (value) {
-  if (typeof value === 'number') {
-    return value % 1 === 0 ? value : NaN;
-  }
-
-  return /^[+-]?\d+$/.test(value) ? Number(value) : NaN;
+  return value % 1 === 0 ? Number(value) : NaN;
 };
 
 /**
