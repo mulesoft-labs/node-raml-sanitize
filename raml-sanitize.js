@@ -1,4 +1,14 @@
 /**
+ * Check if a value is empty.
+ *
+ * @param  {*}       value
+ * @return {Boolean}
+ */
+var isEmpty = function (value) {
+  return value == null;
+};
+
+/**
  * Convert a value into a boolean.
  *
  * @param  {String}  value
@@ -16,7 +26,7 @@ var toBoolean = function (value) {
  * @return {Number}
  */
 var toNumber = function (value) {
-  return isFinite(value) ? Number(value) : NaN;
+  return isFinite(value) ? Number(value) : null;
 };
 
 /**
@@ -27,7 +37,7 @@ var toNumber = function (value) {
  * @return {Number}
  */
 var toInteger = function (value) {
-  return value % 1 === 0 ? Number(value) : NaN;
+  return value % 1 === 0 ? Number(value) : null;
 };
 
 /**
@@ -37,51 +47,99 @@ var toInteger = function (value) {
  * @return {Date}
  */
 var toDate = function (value) {
-  return new Date(value);
+  return !isNaN(Date.parse(value)) ? new Date(value) : null;
 };
 
 /**
  * Convert the schema config into a single sanitization function.
  *
- * @param  {Object}   config
+ * @param  {Object}   configs
  * @param  {Object}   rules
  * @param  {Object}   types
  * @return {Function}
  */
-var toSanitization = function (config, rules, types) {
-  var fns = [];
+var toSanitization = function (configs, rules, types) {
+  configs = Array.isArray(configs) ? configs : [configs];
 
-  // Push type sanitization first.
-  if (typeof types[config.type] === 'function') {
-    fns.push(types[config.type]);
-  }
+  // Map configurations into function sanitization chains.
+  var sanitizations = configs.map(function (config) {
+    var fns = [];
 
-  // Iterate over the schema configuration and push sanitization functions into
-  // the sanitization array.
-  Object.keys(config).filter(function (rule) {
-    return rule !== 'type' && rule !== 'repeat' && rule !== 'default';
-  }).forEach(function (rule) {
-    if (typeof rules[rule] === 'function') {
-      fns.push(rules[rule](config[rule], rule, config));
+    // Push type sanitization first.
+    if (typeof types[config.type] === 'function') {
+      fns.push(types[config.type]);
     }
-  });
 
-  /**
-   * Sanitize a single value using the function chain.
-   *
-   * @param  {*}      value
-   * @param  {String} key
-   * @param  {Object} object
-   * @return {*}
-   */
-  var sanitize = function (value, key, object) {
-    // Iterate over each of sanitization functions and return a single value.
-    fns.forEach(function (fn) {
-      value = fn(value, key, object);
+    // Iterate over the schema configuration and push sanitization functions
+    // into the sanitization array.
+    Object.keys(config).filter(function (rule) {
+      return rule !== 'type' && rule !== 'repeat' && rule !== 'default';
+    }).forEach(function (rule) {
+      if (typeof rules[rule] === 'function') {
+        fns.push(rules[rule](config[rule], rule, config));
+      }
     });
 
-    return value;
-  };
+    /**
+     * Sanitize a single value using the function chain. Breaks when any value
+     * returns an empty value (`null` or `undefined`).
+     *
+     * @param  {*}      value
+     * @param  {String} key
+     * @param  {Object} object
+     * @return {*}
+     */
+    var sanitize = function (value, key, object) {
+      // Iterate over each sanitization function and return a single value.
+      fns.every(function (fn) {
+        value = fn(value, key, object);
+
+        // Break when the value returns `null`.
+        return value != null;
+      });
+
+      return value;
+    };
+
+    /**
+     * Do the entire sanitization flow using the current config.
+     *
+     * @param  {*}      value
+     * @param  {String} key
+     * @param  {Object} object
+     * @return {*}
+     */
+    return function sanitization (value, key, object) {
+      // Immediately return empty values with attempting to sanitize.
+      if (isEmpty(value)) {
+        // Fallback to providing the default value instead.
+        if (config.default != null) {
+          return sanitization(config.default, key, object);
+        }
+
+        // Return an empty array for repeatable values.
+        return config.repeat && !config.required ? [] : value;
+      }
+
+      // Support repeated parameters as arrays.
+      if (config.repeat) {
+        // Turn the result into an array
+        if (!Array.isArray(value)) {
+          value = [value];
+        }
+
+        // Map every value to be sanitized into a new array.
+        value = value.map(function (value) {
+          return sanitize(value, key, object);
+        });
+
+        // If any of the values are empty, refuse the sanitization.
+        return value.some(isEmpty) ? null : value;
+      }
+
+      return sanitize(value, key, object);
+    };
+  });
 
   /**
    * Pass in a value to be sanitized.
@@ -91,31 +149,25 @@ var toSanitization = function (config, rules, types) {
    * @param  {Object} object
    * @return {*}
    */
-  return function sanitization (value, key, object) {
-    // Immediately return empty values with attempting to sanitize.
-    if (value == null) {
-      // Fallback to providing the default value instead.
-      if (config.default != null) {
-        return sanitization(config.default, key, object);
+  return function (value, key, object) {
+    var result = value;
+
+    // Iterate over each sanitization until one is not empty.
+    sanitizations.some(function (sanitization) {
+      var sanitized = sanitization(value, key, object);
+
+      // If the value was accepted and sanitized, return it.
+      if (sanitized != null) {
+        // Assign the sanitized value to the result.
+        result = sanitized;
+
+        return true;
       }
 
-      // Return an empty array for repeatable values.
-      return config.repeat ? [] : value;
-    }
+      return false;
+    });
 
-    // Support repeated parameters as arrays.
-    if (config.repeat) {
-      // Convert the value into array when needed.
-      if (!Array.isArray(value)) {
-        value = [value];
-      }
-
-      return value.map(function (value) {
-        return sanitize(value, key, object);
-      });
-    }
-
-    return sanitize(value, key, object);
+    return result;
   };
 };
 

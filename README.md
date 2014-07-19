@@ -1,6 +1,6 @@
 # RAML Sanitize
 
-Strict sanitization of [RAML parameters](https://github.com/raml-org/raml-spec/blob/master/raml-0.8.md#named-parameters) into correct values and types. Allows for types to be plugged in dynamically.
+Strict sanitization of [RAML parameters](https://github.com/raml-org/raml-spec/blob/master/raml-0.8.md#named-parameters) into correct types for JavaScript. If sanitization fails, the original value is returned.
 
 ## Why?
 
@@ -57,29 +57,17 @@ When the value is empty and a `default` value has been provided, it will return 
 
 #### Repeated values
 
-When the repeat flag is set to `true`, the return value will always be an array. If the value is not an array, it will be wrapped in an array. If the value is empty, an empty array will be returned.
+When the repeat flag is set to `true`, the return value will be an array. If the value is not an array, it will be wrapped in an array. If the value is empty, an empty array will be returned.
 
 ### Caveats
 
-#### Empty Values
+#### Invalid Sanitization
 
-Any empty values (`null` and `undefined`) will be returned.
-
-#### Numbers
-
-Only valid JavaScript numbers will be correctly sanitized. Any invalid or infinite number will return `NaN`.
-
-#### Integers
-
-Only valid integers and valid JavaScript numbers will sanitize. Any invalid integer or infinite number will return `NaN`.
+If a sanitization is invalid, the original value will be returned instead.
 
 #### Booleans
 
 Only `false`, `0`, `"false"`, `"0"` and `""` will return `false`. Everything else is considered `true`.
-
-#### Dates
-
-Date sanitization will always return a date object. In the case of an invalid date, you will receive an invalid date object.
 
 ## License
 

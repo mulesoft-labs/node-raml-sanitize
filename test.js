@@ -41,6 +41,13 @@ var TESTS = [
     { param: true },
     { param: 'true' }
   ],
+  [
+    {
+      param: { type: 'string' }
+    },
+    { param: ['test'] },
+    { param: 'test' }
+  ],
   /**
    * Number sanitization.
    */
@@ -77,14 +84,14 @@ var TESTS = [
       param: { type: 'number' }
     },
     { param: Infinity },
-    { param: NaN }
+    { param: Infinity }
   ],
   [
     {
       param: { type: 'number' }
     },
     { param: 'abc' },
-    { param: NaN }
+    { param: 'abc' }
   ],
   [
     {
@@ -92,6 +99,13 @@ var TESTS = [
     },
     { param: new Array(50).join(5) + '.' + new Array(50).join(5) },
     { param: Number(new Array(50).join(5) + '.' + new Array(50).join(5)) }
+  ],
+  [
+    {
+      param: { type: 'number' }
+    },
+    { param: '123.5' },
+    { param: 123.5 }
   ],
   /**
    * Integer sanitization.
@@ -115,14 +129,14 @@ var TESTS = [
       param: { type: 'integer' }
     },
     { param: 123.5 },
-    { param: NaN }
+    { param: 123.5 }
   ],
   [
     {
       param: { type: 'integer' }
     },
     { param: '123.5' },
-    { param: NaN }
+    { param: '123.5' }
   ],
   [
     {
@@ -136,7 +150,7 @@ var TESTS = [
       param: { type: 'integer' }
     },
     { param: Infinity },
-    { param: NaN }
+    { param: Infinity }
   ],
   [
     {
@@ -144,6 +158,13 @@ var TESTS = [
     },
     { param: new Array(50).join(5) },
     { param: Number(new Array(50).join(5)) }
+  ],
+  [
+    {
+      param: { type: 'integer' }
+    },
+    { param: ['123'] },
+    { param: 123 }
   ],
   /**
    * Date sanitization.
@@ -167,7 +188,14 @@ var TESTS = [
       param: { type: 'date' }
     },
     { param: 'abc' },
-    { param: new Date('abc') }
+    { param: 'abc' }
+  ],
+  [
+    {
+      param: { type: 'date' }
+    },
+    { param: ['Mon, 23 Jun 2014 01:19:34 GMT'] },
+    { param: new Date('Mon, 23 Jun 2014 01:19:34 GMT') }
   ],
   /**
    * Boolean sanitization.
@@ -242,6 +270,13 @@ var TESTS = [
     { param: 'a' },
     { param: true }
   ],
+  [
+    {
+      param: { type: 'boolean' }
+    },
+    { param: ['a'] },
+    { param: true }
+  ],
   /**
    * Repeated values.
    */
@@ -271,7 +306,7 @@ var TESTS = [
       param: { type: 'number', repeat: true }
     },
     { param: ['123', 'abc'] },
-    { param: [123, NaN] }
+    { param: ['123', 'abc'] }
   ],
   [
     {
@@ -343,6 +378,45 @@ var TESTS = [
       username: 'blakeembrey',
       birthday: new Date('Mon, 23 Jun 2014 01:19:34 GMT'),
       luckyNumber: 3
+    }
+  ],
+  /**
+   * Multiple type sanitizations.
+   */
+  [
+    {
+      param: [
+        {
+          type: 'integer'
+        },
+        {
+          type: 'string'
+        }
+      ]
+    },
+    {
+      param: '123'
+    },
+    {
+      param: 123
+    }
+  ],
+  [
+    {
+      param: [
+        {
+          type: 'integer'
+        },
+        {
+          type: 'string'
+        }
+      ]
+    },
+    {
+      param: 'abc'
+    },
+    {
+      param: 'abc'
     }
   ]
 ];
