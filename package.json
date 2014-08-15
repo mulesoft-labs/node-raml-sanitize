@@ -13,7 +13,8 @@
   "keywords": [
     "raml",
     "schema",
-    "validation"
+    "sanitization",
+    "types"
   ],
   "author": "MuleSoft, Inc.",
   "license": "Apache 2.0",
