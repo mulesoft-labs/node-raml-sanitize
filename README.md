@@ -1,5 +1,9 @@
 # RAML Sanitize
 
+[![NPM version][npm-image]][npm-url]
+[![Build status][travis-image]][travis-url]
+[![Test coverage][coveralls-image]][coveralls-url]
+
 Strict sanitization of [RAML parameters](https://github.com/raml-org/raml-spec/blob/master/raml-0.8.md#named-parameters) into correct types for JavaScript. If sanitization fails, the original value is returned.
 
 ## Why?
@@ -72,3 +76,10 @@ Only `false`, `0`, `"false"`, `"0"` and `""` will return `false`. Everything els
 ## License
 
 Apache 2.0
+
+[npm-image]: https://img.shields.io/npm/v/raml-sanitize.svg?style=flat
+[npm-url]: https://npmjs.org/package/raml-sanitize
+[travis-image]: https://img.shields.io/travis/mulesoft/node-raml-sanitize.svg?style=flat
+[travis-url]: https://travis-ci.org/mulesoft/node-raml-sanitize
+[coveralls-image]: https://img.shields.io/coveralls/mulesoft/node-raml-sanitize.svg?style=flat
+[coveralls-url]: https://coveralls.io/r/mulesoft/node-raml-sanitize?branch=master
