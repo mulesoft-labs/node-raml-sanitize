@@ -43,6 +43,8 @@ user({
 // => { username: 'blakeembrey', password: 'hunter2', birthday: new Date() }
 ```
 
+**Module does not currently support [wild-card parameters](https://github.com/raml-org/raml-spec/blob/master/raml-0.8.md#headers)**
+
 ### Type sanitization
 
 The module comes with built-in type sanitization of all [RAML parameters](https://github.com/raml-org/raml-spec/blob/master/raml-0.8.md#named-parameters) - `string`, `number`, `integer`, `date` and `boolean`. To add a new type sanitization, add a new property with the corresponding name to the `sanitize.TYPES` object.
