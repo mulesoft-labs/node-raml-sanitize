@@ -4,7 +4,7 @@
  * @param  {*}       value
  * @return {Boolean}
  */
-var isEmpty = function (value) {
+function isEmpty (value) {
   return value == null;
 };
 
@@ -14,7 +14,7 @@ var isEmpty = function (value) {
  * @param  {String}  value
  * @return {Boolean}
  */
-var toBoolean = function (value) {
+function toBoolean (value) {
   return [0, false, '', '0', 'false'].indexOf(value) === -1;
 };
 
@@ -25,9 +25,9 @@ var toBoolean = function (value) {
  * @param  {String} value
  * @return {Number}
  */
-var toNumber = function (value) {
+function toNumber (value) {
   return isFinite(value) ? Number(value) : null;
-};
+}
 
 /**
  * Convert a value into an integer. Use strict sanitization - if something is
@@ -36,9 +36,9 @@ var toNumber = function (value) {
  * @param  {String} value
  * @return {Number}
  */
-var toInteger = function (value) {
+function toInteger (value) {
   return value % 1 === 0 ? Number(value) : null;
-};
+}
 
 /**
  * Convert a value into a date.
@@ -46,9 +46,9 @@ var toInteger = function (value) {
  * @param  {String} value
  * @return {Date}
  */
-var toDate = function (value) {
+function toDate (value) {
   return !isNaN(Date.parse(value)) ? new Date(value) : null;
-};
+}
 
 /**
  * Convert the schema config into a single sanitization function.
@@ -58,7 +58,7 @@ var toDate = function (value) {
  * @param  {Object}   types
  * @return {Function}
  */
-var toSanitization = function (configs, rules, types) {
+function toSanitization (configs, rules, types) {
   configs = Array.isArray(configs) ? configs : [configs];
 
   // Map configurations into function sanitization chains.
@@ -169,7 +169,7 @@ var toSanitization = function (configs, rules, types) {
 
     return result;
   };
-};
+}
 
 /**
  * Every time the module is exported and executed, we return a new instance.
@@ -183,7 +183,13 @@ module.exports = function () {
    * @param  {Object}   schema
    * @return {Function}
    */
-  var sanitize = function (schema) {
+  function sanitize (schema) {
+    if (!schema) {
+      return function () {
+        return {};
+      };
+    }
+
     var sanitizations = {};
 
     // Map each parameter in the schema to a validation function.
@@ -222,7 +228,7 @@ module.exports = function () {
 
       return sanitized;
     };
-  };
+  }
 
   /**
    * Provide sanitization based on types.
