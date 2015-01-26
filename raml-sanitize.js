@@ -6,7 +6,7 @@
  */
 function isEmpty (value) {
   return value == null;
-};
+}
 
 /**
  * Convert a value into a boolean.
@@ -16,7 +16,7 @@ function isEmpty (value) {
  */
 function toBoolean (value) {
   return [0, false, '', '0', 'false'].indexOf(value) === -1;
-};
+}
 
 /**
  * Convert a value into a number. Non-number strings and infinite values will
