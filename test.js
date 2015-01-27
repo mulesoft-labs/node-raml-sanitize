@@ -282,6 +282,13 @@ var TESTS = [
    */
   [
     {
+      param: { type: 'boolean' }
+    },
+    { param: [123, 456] },
+    { param: [123, 456] }
+  ],
+  [
+    {
       param: { type: 'integer', repeat: true }
     },
     { param: null },

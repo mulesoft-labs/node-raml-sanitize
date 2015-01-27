@@ -89,7 +89,7 @@ function toSanitization (configs, rules, types) {
      * @param  {Object} object
      * @return {*}
      */
-    var sanitize = function (value, key, object) {
+    function sanitize (value, key, object) {
       // Iterate over each sanitization function and return a single value.
       fns.every(function (fn) {
         value = fn(value, key, object);
@@ -99,7 +99,7 @@ function toSanitization (configs, rules, types) {
       });
 
       return value;
-    };
+    }
 
     /**
      * Do the entire sanitization flow using the current config.
@@ -137,6 +137,15 @@ function toSanitization (configs, rules, types) {
         return value.some(isEmpty) ? null : value;
       }
 
+      // Support array inputs.
+      if (Array.isArray(value)) {
+        if (value.length > 1) {
+          return null;
+        }
+
+        value = value[0];
+      }
+
       return sanitize(value, key, object);
     };
   });
@@ -156,7 +165,7 @@ function toSanitization (configs, rules, types) {
     sanitizations.some(function (sanitization) {
       var sanitized = sanitization(value, key, object);
 
-      // If the value was accepted and sanitized, return it.
+      // If the value is accepted, return it.
       if (sanitized != null) {
         // Assign the sanitized value to the result.
         result = sanitized;
