@@ -181,7 +181,7 @@ function toSanitization (configs, rules, types) {
 }
 
 /**
- * Every time the module is exported and executed, we return a new instance.
+ * Every time the module executes, we return a new instance.
  *
  * @return {Function}
  */
@@ -203,11 +203,7 @@ module.exports = function () {
 
     // Map each parameter in the schema to a validation function.
     Object.keys(schema).forEach(function (param) {
-      var config = schema[param];
-      var types  = sanitize.TYPES;
-      var rules  = sanitize.RULES;
-
-      sanitizations[param] = toSanitization(config, rules, types);
+      sanitizations[param] = sanitize.rule(schema[param]);
     });
 
     /**
@@ -219,11 +215,10 @@ module.exports = function () {
     return function (model) {
       model = model || {};
 
-      // Create a new model instance to be sanitized without any additional
-      // properties or overrides occuring.
+      // Create a new model instance to sanitize without any extra properties.
       var sanitized = {};
 
-      // Iterate only the sanitized parameters to get a clean model.
+      // Iterate the sanitized parameters to get a clean model.
       Object.keys(sanitizations).forEach(function (param) {
         var value    = model[param];
         var sanitize = sanitizations[param];
@@ -238,6 +233,16 @@ module.exports = function () {
       return sanitized;
     };
   }
+
+  /**
+   * Sanitize a single parameter config.
+   *
+   * @param  {Object}   config
+   * @return {Function}
+   */
+  sanitize.rule = function rule (config) {
+    return toSanitization(config, sanitize.RULES, sanitize.TYPES);
+  };
 
   /**
    * Provide sanitization based on types.
