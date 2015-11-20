@@ -223,7 +223,11 @@ module.exports = function () {
         var value    = model[param];
         var sanitize = sanitizations[param];
 
-        sanitized[param] = sanitize(value, param, model);
+        if (Object.prototype.hasOwnProperty.call(model, param)) {
+          sanitized[param] = sanitize(value, param, model);
+        } else {
+          sanitized[param] = sanitize(undefined, param, model);
+        }
       });
 
       return sanitized;
