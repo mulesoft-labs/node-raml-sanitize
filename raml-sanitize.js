@@ -223,11 +223,7 @@ module.exports = function () {
         var value    = model[param];
         var sanitize = sanitizations[param];
 
-        // Ensure the value is a direct property on the model object before
-        // sanitizing. The keeps model handling in sync with expectations.
-        if (Object.prototype.hasOwnProperty.call(model, param)) {
-          sanitized[param] = sanitize(value, param, model);
-        }
+        sanitized[param] = sanitize(value, param, model);
       });
 
       return sanitized;

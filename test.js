@@ -291,7 +291,7 @@ var TESTS = [
     {
       param: { type: 'integer', repeat: true }
     },
-    { param: null },
+    {},
     { param: [] }
   ],
   [
@@ -344,6 +344,13 @@ var TESTS = [
       param: { type: 'string', default: 'test' }
     },
     { param: null },
+    { param: 'test' }
+  ],
+  [
+    {
+      param: { type: 'string', default: 'test' }
+    },
+    {},
     { param: 'test' }
   ],
   [
