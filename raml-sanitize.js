@@ -226,8 +226,14 @@ module.exports = function () {
         if (Object.prototype.hasOwnProperty.call(model, param)) {
           sanitized[param] = sanitize(value, param, model);
         } else {
-          sanitized[param] = sanitize(undefined, param, model);
+          var sanitizedValue = sanitize(undefined, param, model);
+
+          // Only set non-null values on the model.
+          if (sanitizedValue != null) {
+            sanitized[param] = sanitizedValue;
+          }
         }
+
       });
 
       return sanitized;
