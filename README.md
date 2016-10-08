@@ -69,7 +69,7 @@ When the repeat flag is set to `true`, the return value will be an array. If the
 
 #### Type Expressions (RAML 1.0)
 
-The module does not support type [expressions](https://github.com/raml-org/raml-spec/blob/master/versions/raml-10/raml-10.md#type-expressions).
+The module does not support [type expressions](https://github.com/raml-org/raml-spec/blob/master/versions/raml-10/raml-10.md#type-expressions).
 
 #### Invalid Sanitization
 
