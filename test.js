@@ -1,7 +1,7 @@
 /* global describe, it */
-var util     = require('util');
-var expect   = require('chai').expect;
-var sanitize = require('./')();
+var util = require('util')
+var expect = require('chai').expect
+var sanitize = require('./')()
 
 /**
  * An array of all the tests to execute. Tests are in the format of:
@@ -433,25 +433,25 @@ var TESTS = [
       param: 'abc'
     }
   ]
-];
+]
 
 describe('raml-sanitize', function () {
   /**
    * Run through each of the defined tests to generate the test suite.
    */
   TESTS.forEach(function (test) {
-    var params = test[0];
-    var object = test[1];
-    var output = test[2];
+    var params = test[0]
+    var object = test[1]
+    var output = test[2]
 
     var description = [
       util.inspect(params),
       'should sanitize',
       util.inspect(object)
-    ].join(' ');
+    ].join(' ')
 
     it(description, function () {
-      expect(sanitize(params)(object)).to.deep.equal(output);
-    });
-  });
-});
+      expect(sanitize(params)(object)).to.deep.equal(output)
+    })
+  })
+})
