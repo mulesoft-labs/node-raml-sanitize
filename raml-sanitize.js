@@ -51,6 +51,19 @@ function toDate (value) {
 }
 
 /**
+ * Convert a value into an array.
+ *
+ * @param  {String} value
+ * @return {Array}
+ */
+function toArray (value) {
+  try {
+    value = JSON.parse(value)
+  } catch (e) {}
+  return Array.isArray(value) ? value : null
+}
+
+/**
  * Convert the schema config into a single sanitization function.
  *
  * @param  {Object}   configs
@@ -259,6 +272,7 @@ module.exports = function () {
     number: toNumber,
     integer: toInteger,
     boolean: toBoolean,
+    array: toArray,
     date: toDate
   }
 

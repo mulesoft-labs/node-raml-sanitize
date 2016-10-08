@@ -278,6 +278,58 @@ var TESTS = [
     { param: true }
   ],
   /**
+   * Array sanitization.
+   */
+  [
+    {
+      param: { type: 'array' }
+    },
+    { param: null },
+    { param: null }
+  ],
+  [
+    {
+      param: { type: 'array' }
+    },
+    { param: '[]' },
+    { param: [] }
+  ],
+  [
+    {
+      param: { type: 'array' }
+    },
+    { param: '["a"]' },
+    { param: ['a'] }
+  ],
+  [
+    {
+      param: { type: 'array' }
+    },
+    { param: '[a]' },
+    { param: '[a]' }
+  ],
+  [
+    {
+      param: { type: 'array' }
+    },
+    { param: '[1]' },
+    { param: [1] }
+  ],
+  [
+    {
+      param: { type: 'array' }
+    },
+    { param: '["a", 1, true]' },
+    { param: ['a', 1, true] }
+  ],
+  [
+    {
+      param: { type: 'array' }
+    },
+    { param: '["a", 1, tru]' },
+    { param: '["a", 1, tru]' }
+  ],
+  /**
    * Repeated values.
    */
   [
