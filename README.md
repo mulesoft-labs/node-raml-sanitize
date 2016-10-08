@@ -4,11 +4,11 @@
 [![Build status][travis-image]][travis-url]
 [![Test coverage][coveralls-image]][coveralls-url]
 
-Strict sanitization of [RAML parameters](https://github.com/raml-org/raml-spec/blob/master/raml-0.8.md#named-parameters) into correct types for JavaScript. If sanitization fails, the original value is returned.
+Strict sanitization of [RAML 0.8 named parameters](https://github.com/raml-org/raml-spec/blob/master/versions/raml-08/raml-08.md#named-parameters) and [RAML 1.0 built-in types](https://github.com/raml-org/raml-spec/blob/master/versions/raml-10/raml-10.md#built-in-types).
 
 ## Why?
 
-This module sanitizes values using the RAML parameter syntax. You should use this if you need to convert any request parameters (usually strings) into the corresponding JavaScript types. For example, form request bodies, query parameters and headers all have no concept of types. After running sanitization, you can use [raml-validate](https://github.com/blakeembrey/raml-validate) to validate the strict values.
+This module sanitizes values using the RAML parameter syntax. You should use this if you need to convert any request parameters (usually strings) into the corresponding JavaScript types. For example, form request bodies, query parameters and headers all have no concept of types. After running sanitization, you can use [raml-validate](https://github.com/mulesoft/node-raml-validate) to validate the strict values.
 
 ## Installation
 
@@ -47,7 +47,7 @@ user({
 
 ### Type sanitization
 
-The module comes with built-in type sanitization of all [RAML parameters](https://github.com/raml-org/raml-spec/blob/master/raml-0.8.md#named-parameters) - `string`, `number`, `integer`, `date` and `boolean`. To add a new type sanitization, add a new property with the corresponding name to the `sanitize.TYPES` object.
+The module comes with built-in type sanitization of `string`, `number`, `integer`, `array`, `date` and `boolean`. To add a new type sanitization, add a new property with the corresponding name to the `sanitize.TYPES` object.
 
 ### Rule sanitization
 
