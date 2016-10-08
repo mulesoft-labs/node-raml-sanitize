@@ -47,7 +47,7 @@ user({
 
 ### Type sanitization
 
-The module comes with built-in type sanitization of `string`, `number`, `integer`, `array`, `date` and `boolean`. To add a new type sanitization, add a new property with the corresponding name to the `sanitize.TYPES` object.
+The module comes with built-in type sanitization of `string`, `number`, `integer`, `array`, `object`, `date` and `boolean`. To add a new type sanitization, add a new property with the corresponding name to the `sanitize.TYPES` object.
 
 ### Rule sanitization
 

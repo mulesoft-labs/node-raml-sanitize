@@ -330,6 +330,58 @@ var TESTS = [
     { param: '["a", 1, tru]' }
   ],
   /**
+   * Object sanitization.
+   */
+  [
+    {
+      param: { type: 'object' }
+    },
+    { param: null },
+    { param: null }
+  ],
+  [
+    {
+      param: { type: 'object' }
+    },
+    { param: '{}' },
+    { param: {} }
+  ],
+  [
+    {
+      param: { type: 'object' }
+    },
+    { param: '{ "foo" :"bar"}' },
+    { param: { foo: 'bar' } }
+  ],
+  [
+    {
+      param: { type: 'object' }
+    },
+    { param: '{"foo": 1 }' },
+    { param: { foo: 1 } }
+  ],
+  [
+    {
+      param: { type: 'object' }
+    },
+    { param: '{"foo": true }' },
+    { param: { foo: true } }
+  ],
+  [
+    {
+      param: { type: 'object' }
+    },
+    { param: '{"foo"}' },
+    { param: '{"foo"}' }
+  ],
+  [
+    {
+      param: { type: 'object' }
+    },
+    { param: '{"foo" : 1, }' },
+    { param: '{"foo" : 1, }' }
+  ],
+  /**
    * Repeated values.
    */
   [

@@ -64,6 +64,19 @@ function toArray (value) {
 }
 
 /**
+ * Convert a value into an object.
+ *
+ * @param  {String} value
+ * @return {Object}
+ */
+function toObject (value) {
+  try {
+    value = JSON.parse(value)
+  } catch (e) {}
+  return value.constructor === {}.constructor ? value : null
+}
+
+/**
  * Convert the schema config into a single sanitization function.
  *
  * @param  {Object}   configs
@@ -273,6 +286,7 @@ module.exports = function () {
     integer: toInteger,
     boolean: toBoolean,
     array: toArray,
+    object: toObject,
     date: toDate
   }
 
