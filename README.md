@@ -61,15 +61,15 @@ Empty values are automatically allowed to pass through sanitization. The only va
 
 When the value is empty and a `default` value has been provided, it will return the default value instead.
 
-#### Repeated values
+#### Repeated values (RAML 0.8)
 
 When the repeat flag is set to `true`, the return value will be an array. If the value is not an array, it will be wrapped in an array. If the value is empty, an empty array will be returned.
 
 ### Caveats
 
-#### Type Expressions (RAML 1.0)
+#### Limitations with types (RAML 1.0)
 
-The module does not support [type expressions](https://github.com/raml-org/raml-spec/blob/master/versions/raml-10/raml-10.md#type-expressions).
+The module does not support neither [Type Expressions](https://github.com/raml-org/raml-spec/blob/master/versions/raml-10/raml-10.md#type-expressions) nor [Union Type](https://github.com/raml-org/raml-spec/blob/master/versions/raml-10/raml-10.md#union-type).
 
 #### Invalid Sanitization
 
