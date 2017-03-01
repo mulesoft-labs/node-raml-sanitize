@@ -5,7 +5,7 @@
  * @return {Boolean}
  */
 function isEmpty (value) {
-  return value == null;
+  return value == null
 }
 
 /**
@@ -15,7 +15,7 @@ function isEmpty (value) {
  * @return {Boolean}
  */
 function toBoolean (value) {
-  return [0, false, '', '0', 'false'].indexOf(value) === -1;
+  return [0, false, '', '0', 'false'].indexOf(value) === -1
 }
 
 /**
@@ -26,7 +26,7 @@ function toBoolean (value) {
  * @return {Number}
  */
 function toNumber (value) {
-  return isFinite(value) ? Number(value) : null;
+  return isFinite(value) ? Number(value) : null
 }
 
 /**
@@ -37,7 +37,7 @@ function toNumber (value) {
  * @return {Number}
  */
 function toInteger (value) {
-  return value % 1 === 0 ? Number(value) : null;
+  return value % 1 === 0 ? Number(value) : null
 }
 
 /**
@@ -47,7 +47,33 @@ function toInteger (value) {
  * @return {Date}
  */
 function toDate (value) {
-  return !isNaN(Date.parse(value)) ? new Date(value) : null;
+  return !isNaN(Date.parse(value)) ? new Date(value) : null
+}
+
+/**
+ * Convert a value into an array.
+ *
+ * @param  {String} value
+ * @return {Array}
+ */
+function toArray (value) {
+  try {
+    value = JSON.parse(value)
+  } catch (e) {}
+  return Array.isArray(value) ? value : null
+}
+
+/**
+ * Convert a value into an object.
+ *
+ * @param  {String} value
+ * @return {Object}
+ */
+function toObject (value) {
+  try {
+    value = JSON.parse(value)
+  } catch (e) {}
+  return value.constructor === {}.constructor ? value : null
 }
 
 /**
@@ -59,26 +85,26 @@ function toDate (value) {
  * @return {Function}
  */
 function toSanitization (configs, rules, types) {
-  configs = Array.isArray(configs) ? configs : [configs];
+  configs = Array.isArray(configs) ? configs : [configs]
 
   // Map configurations into function sanitization chains.
   var sanitizations = configs.map(function (config) {
-    var fns = [];
+    var fns = []
 
     // Push type sanitization first.
     if (typeof types[config.type] === 'function') {
-      fns.push(types[config.type]);
+      fns.push(types[config.type])
     }
 
     // Iterate over the schema configuration and push sanitization functions
     // into the sanitization array.
     Object.keys(config).filter(function (rule) {
-      return rule !== 'type' && rule !== 'repeat' && rule !== 'default';
+      return rule !== 'type' && rule !== 'repeat' && rule !== 'default'
     }).forEach(function (rule) {
       if (typeof rules[rule] === 'function') {
-        fns.push(rules[rule](config[rule], rule, config));
+        fns.push(rules[rule](config[rule], rule, config))
       }
-    });
+    })
 
     /**
      * Sanitize a single value using the function chain. Breaks when any value
@@ -92,13 +118,13 @@ function toSanitization (configs, rules, types) {
     function sanitize (value, key, object) {
       // Iterate over each sanitization function and return a single value.
       fns.every(function (fn) {
-        value = fn(value, key, object);
+        value = fn(value, key, object)
 
         // Break when the value returns `null`.
-        return value != null;
-      });
+        return value != null
+      })
 
-      return value;
+      return value
     }
 
     /**
@@ -114,41 +140,41 @@ function toSanitization (configs, rules, types) {
       if (isEmpty(value)) {
         // Fallback to providing the default value instead.
         if (config.default != null) {
-          return sanitization(config.default, key, object);
+          return sanitization(config.default, key, object)
         }
 
         // Return an empty array for repeatable values.
-        return config.repeat && !config.required ? [] : value;
+        return config.repeat && !config.required ? [] : value
       }
 
       // Support repeated parameters as arrays.
       if (config.repeat) {
         // Turn the result into an array
         if (!Array.isArray(value)) {
-          value = [value];
+          value = [value]
         }
 
         // Map every value to be sanitized into a new array.
         value = value.map(function (value) {
-          return sanitize(value, key, object);
-        });
+          return sanitize(value, key, object)
+        })
 
         // If any of the values are empty, refuse the sanitization.
-        return value.some(isEmpty) ? null : value;
+        return value.some(isEmpty) ? null : value
       }
 
       // Support array inputs.
       if (Array.isArray(value)) {
         if (value.length > 1) {
-          return null;
+          return null
         }
 
-        value = value[0];
+        value = value[0]
       }
 
-      return sanitize(value, key, object);
-    };
-  });
+      return sanitize(value, key, object)
+    }
+  })
 
   /**
    * Pass in a value to be sanitized.
@@ -159,25 +185,25 @@ function toSanitization (configs, rules, types) {
    * @return {*}
    */
   return function (value, key, object) {
-    var result = value;
+    var result = value
 
     // Iterate over each sanitization until one is not empty.
     sanitizations.some(function (sanitization) {
-      var sanitized = sanitization(value, key, object);
+      var sanitized = sanitization(value, key, object)
 
       // If the value is accepted, return it.
       if (sanitized != null) {
         // Assign the sanitized value to the result.
-        result = sanitized;
+        result = sanitized
 
-        return true;
+        return true
       }
 
-      return false;
-    });
+      return false
+    })
 
-    return result;
-  };
+    return result
+  }
 }
 
 /**
@@ -195,16 +221,16 @@ module.exports = function () {
   function sanitize (schema) {
     if (!schema) {
       return function () {
-        return {};
-      };
+        return {}
+      }
     }
 
-    var sanitizations = {};
+    var sanitizations = {}
 
     // Map each parameter in the schema to a validation function.
     Object.keys(schema).forEach(function (param) {
-      sanitizations[param] = sanitize.rule(schema[param]);
-    });
+      sanitizations[param] = sanitize.rule(schema[param])
+    })
 
     /**
      * Execute the returned function with a model to return a sanitized object.
@@ -213,31 +239,30 @@ module.exports = function () {
      * @return {Object}
      */
     return function (model) {
-      model = model || {};
+      model = model || {}
 
       // Create a new model instance to sanitize without any extra properties.
-      var sanitized = {};
+      var sanitized = {}
 
       // Iterate the sanitized parameters to get a clean model.
       Object.keys(sanitizations).forEach(function (param) {
-        var value    = model[param];
-        var sanitize = sanitizations[param];
+        var value = model[param]
+        var sanitize = sanitizations[param]
 
         if (Object.prototype.hasOwnProperty.call(model, param)) {
-          sanitized[param] = sanitize(value, param, model);
+          sanitized[param] = sanitize(value, param, model)
         } else {
-          var sanitizedValue = sanitize(undefined, param, model);
+          var sanitizedValue = sanitize(undefined, param, model)
 
           // Only set non-null values on the model.
           if (sanitizedValue != null) {
-            sanitized[param] = sanitizedValue;
+            sanitized[param] = sanitizedValue
           }
         }
+      })
 
-      });
-
-      return sanitized;
-    };
+      return sanitized
+    }
   }
 
   /**
@@ -247,8 +272,8 @@ module.exports = function () {
    * @return {Function}
    */
   sanitize.rule = function rule (config) {
-    return toSanitization(config, sanitize.RULES, sanitize.TYPES);
-  };
+    return toSanitization(config, sanitize.RULES, sanitize.TYPES)
+  }
 
   /**
    * Provide sanitization based on types.
@@ -256,19 +281,21 @@ module.exports = function () {
    * @type {Object}
    */
   sanitize.TYPES = {
-    string:  String,
-    number:  toNumber,
+    string: String,
+    number: toNumber,
     integer: toInteger,
     boolean: toBoolean,
-    date:    toDate
-  };
+    array: toArray,
+    object: toObject,
+    date: toDate
+  }
 
   /**
    * Provide sanitization based on rules.
    *
    * @type {Object}
    */
-  sanitize.RULES = {};
+  sanitize.RULES = {}
 
-  return sanitize;
-};
+  return sanitize
+}

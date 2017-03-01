@@ -1,10 +1,12 @@
 {
   "name": "raml-sanitize",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "description": "Sanitization of RAML parameters into strict values",
   "main": "raml-sanitize.js",
   "scripts": {
-    "test": "jshint *.js && istanbul cover node_modules/mocha/bin/_mocha -- -R spec"
+    "lint": "standard",
+    "test-cov": "istanbul cover node_modules/mocha/bin/_mocha -- -R spec --bail",
+    "test": "npm run lint; npm run test-cov"
   },
   "repository": {
     "type": "git",
@@ -24,8 +26,8 @@
   "homepage": "https://github.com/mulesoft/node-raml-sanitize",
   "devDependencies": {
     "chai": "^3.5.0",
-    "istanbul": "^0.4.2",
-    "jshint": "^2.5.1",
-    "mocha": "^2.4.5"
+    "istanbul": "^0.4.5",
+    "mocha": "^3.1.0",
+    "standard": "^8.3.0"
   }
 }

@@ -4,11 +4,11 @@
 [![Build status][travis-image]][travis-url]
 [![Test coverage][coveralls-image]][coveralls-url]
 
-Strict sanitization of [RAML parameters](https://github.com/raml-org/raml-spec/blob/master/raml-0.8.md#named-parameters) into correct types for JavaScript. If sanitization fails, the original value is returned.
+Strict sanitization of [RAML 0.8 named parameters](https://github.com/raml-org/raml-spec/blob/master/versions/raml-08/raml-08.md#named-parameters) and [RAML 1.0 built-in types](https://github.com/raml-org/raml-spec/blob/master/versions/raml-10/raml-10.md#built-in-types).
 
 ## Why?
 
-This module sanitizes values using the RAML parameter syntax. You should use this if you need to convert any request parameters (usually strings) into the corresponding JavaScript types. For example, form request bodies, query parameters and headers all have no concept of types. After running sanitization, you can use [raml-validate](https://github.com/blakeembrey/raml-validate) to validate the strict values.
+This module sanitizes values using the RAML parameter syntax. You should use this if you need to convert any request parameters (usually strings) into the corresponding JavaScript types. For example, form request bodies, query parameters and headers all have no concept of types. After running sanitization, you can use [raml-validate](https://github.com/mulesoft/node-raml-validate) to validate the strict values.
 
 ## Installation
 
@@ -43,11 +43,11 @@ user({
 // => { username: 'blakeembrey', password: 'hunter2', birthday: new Date() }
 ```
 
-**Module does not currently support [wild-card parameters](https://github.com/raml-org/raml-spec/blob/master/raml-0.8.md#headers)**
+**Module does not currently support [wild-card parameters](https://github.com/raml-org/raml-spec/blob/master/versions/raml-08/raml-08.md#headers) (RAML 0.8) and regular expression patterns in [property declaration](https://github.com/raml-org/raml-spec/blob/master/versions/raml-10/raml-10.md#property-declarations) (RAML 1.0)**
 
 ### Type sanitization
 
-The module comes with built-in type sanitization of all [RAML parameters](https://github.com/raml-org/raml-spec/blob/master/raml-0.8.md#named-parameters) - `string`, `number`, `integer`, `date` and `boolean`. To add a new type sanitization, add a new property with the corresponding name to the `sanitize.TYPES` object.
+The module comes with built-in type sanitization of `string`, `number`, `integer`, `array`, `object`, `date` and `boolean`. To add a new type sanitization, add a new property with the corresponding name to the `sanitize.TYPES` object.
 
 ### Rule sanitization
 
@@ -61,11 +61,15 @@ Empty values are automatically allowed to pass through sanitization. The only va
 
 When the value is empty and a `default` value has been provided, it will return the default value instead.
 
-#### Repeated values
+#### Repeated values (RAML 0.8)
 
 When the repeat flag is set to `true`, the return value will be an array. If the value is not an array, it will be wrapped in an array. If the value is empty, an empty array will be returned.
 
 ### Caveats
+
+#### Limitations with types (RAML 1.0)
+
+The module does not support neither [Type Expressions](https://github.com/raml-org/raml-spec/blob/master/versions/raml-10/raml-10.md#type-expressions) nor [Union Type](https://github.com/raml-org/raml-spec/blob/master/versions/raml-10/raml-10.md#union-type).
 
 #### Invalid Sanitization
 

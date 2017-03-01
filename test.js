@@ -1,7 +1,7 @@
 /* global describe, it */
-var util     = require('util');
-var expect   = require('chai').expect;
-var sanitize = require('./')();
+var util = require('util')
+var expect = require('chai').expect
+var sanitize = require('./')()
 
 /**
  * An array of all the tests to execute. Tests are in the format of:
@@ -278,6 +278,110 @@ var TESTS = [
     { param: true }
   ],
   /**
+   * Array sanitization.
+   */
+  [
+    {
+      param: { type: 'array' }
+    },
+    { param: null },
+    { param: null }
+  ],
+  [
+    {
+      param: { type: 'array' }
+    },
+    { param: '[]' },
+    { param: [] }
+  ],
+  [
+    {
+      param: { type: 'array' }
+    },
+    { param: '["a"]' },
+    { param: ['a'] }
+  ],
+  [
+    {
+      param: { type: 'array' }
+    },
+    { param: '[a]' },
+    { param: '[a]' }
+  ],
+  [
+    {
+      param: { type: 'array' }
+    },
+    { param: '[1]' },
+    { param: [1] }
+  ],
+  [
+    {
+      param: { type: 'array' }
+    },
+    { param: '["a", 1, true]' },
+    { param: ['a', 1, true] }
+  ],
+  [
+    {
+      param: { type: 'array' }
+    },
+    { param: '["a", 1, tru]' },
+    { param: '["a", 1, tru]' }
+  ],
+  /**
+   * Object sanitization.
+   */
+  [
+    {
+      param: { type: 'object' }
+    },
+    { param: null },
+    { param: null }
+  ],
+  [
+    {
+      param: { type: 'object' }
+    },
+    { param: '{}' },
+    { param: {} }
+  ],
+  [
+    {
+      param: { type: 'object' }
+    },
+    { param: '{ "foo" :"bar"}' },
+    { param: { foo: 'bar' } }
+  ],
+  [
+    {
+      param: { type: 'object' }
+    },
+    { param: '{"foo": 1 }' },
+    { param: { foo: 1 } }
+  ],
+  [
+    {
+      param: { type: 'object' }
+    },
+    { param: '{"foo": true }' },
+    { param: { foo: true } }
+  ],
+  [
+    {
+      param: { type: 'object' }
+    },
+    { param: '{"foo"}' },
+    { param: '{"foo"}' }
+  ],
+  [
+    {
+      param: { type: 'object' }
+    },
+    { param: '{"foo" : 1, }' },
+    { param: '{"foo" : 1, }' }
+  ],
+  /**
    * Repeated values.
    */
   [
@@ -433,25 +537,25 @@ var TESTS = [
       param: 'abc'
     }
   ]
-];
+]
 
 describe('raml-sanitize', function () {
   /**
    * Run through each of the defined tests to generate the test suite.
    */
   TESTS.forEach(function (test) {
-    var params = test[0];
-    var object = test[1];
-    var output = test[2];
+    var params = test[0]
+    var object = test[1]
+    var output = test[2]
 
     var description = [
       util.inspect(params),
       'should sanitize',
       util.inspect(object)
-    ].join(' ');
+    ].join(' ')
 
     it(description, function () {
-      expect(sanitize(params)(object)).to.deep.equal(output);
-    });
-  });
-});
+      expect(sanitize(params)(object)).to.deep.equal(output)
+    })
+  })
+})
