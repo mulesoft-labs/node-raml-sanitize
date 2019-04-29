@@ -172,6 +172,11 @@ function toSanitization (configs, rules, types) {
         value = value[0]
       }
 
+      // Support RAML 1.0 array types for single values.
+      if (Array.isArray(config.type) && config.type.length === 1 && config.type[0] === 'array' && !Array.isArray(value)) {
+        return [value]
+      }
+
       return sanitize(value, key, object)
     }
   })

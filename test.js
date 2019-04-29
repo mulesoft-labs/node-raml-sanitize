@@ -329,6 +329,20 @@ var TESTS = [
     { param: '["a", 1, tru]' },
     { param: '["a", 1, tru]' }
   ],
+  [
+    {
+      param: { type: ['array'] }
+    },
+    { param: 123 },
+    { param: [123] }
+  ],
+  [
+    {
+      param: { type: ['array'] }
+    },
+    { param: [123, 456] },
+    { param: [123, 456] }
+  ],
   /**
    * Object sanitization.
    */
