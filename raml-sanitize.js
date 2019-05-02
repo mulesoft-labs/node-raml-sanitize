@@ -172,6 +172,17 @@ function toSanitization (configs, rules, types) {
         value = value[0]
       }
 
+      // Support RAML 1.0 array types for single values.
+      const isTypeAnArray = Array.isArray(config.type)
+      const hasSingleType = config.type.length === 1
+      const isTypeArrayValue = config.type[0] === 'array'
+      const isValueAnArray = Array.isArray(value)
+      const isSingleValueArrayType = isTypeAnArray && hasSingleType && isTypeArrayValue && !isValueAnArray
+
+      if (isSingleValueArrayType) {
+        return [value]
+      }
+
       return sanitize(value, key, object)
     }
   })

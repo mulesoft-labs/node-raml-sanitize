@@ -329,6 +329,69 @@ var TESTS = [
     { param: '["a", 1, tru]' },
     { param: '["a", 1, tru]' }
   ],
+  [
+    {
+      param: { type: ['array'] }
+    },
+    { param: 123 },
+    { param: [123] }
+  ],
+  [
+    {
+      param: { type: ['array'] }
+    },
+    { param: 'foo' },
+    { param: ['foo'] }
+  ],
+  [
+    {
+      param: { type: ['array'] }
+    },
+    { param: ['foo' ]},
+    { param: ['foo'] }
+  ],
+  [
+    {
+      param: { type: ['array'] }
+    },
+    { param: { foo: 'boo' } },
+    { param: [{ foo: 'boo' }] }
+  ],
+  [
+    {
+      param: { type: ['array'] }
+    },
+    { param: [123, 456] },
+    { param: [123, 456] }
+  ],
+  [
+    {
+      param: { type: ['string'] }
+    },
+    { param: '123' },
+    { param: '123' }
+  ],
+  [
+    {
+      param: { type: ['string', 'array'] }
+    },
+    { param: '123' },
+    { param: '123' }
+  ],
+  [
+    {
+      param: { type: ['string', 'array'] }
+    },
+    { param: 123 },
+    { param: 123 }
+  ],
+  [
+    {
+      param: { type: ['string', 'array'] }
+    },
+    { param: [123, 234] },
+    { param: [123, 234] }
+  ],
   /**
    * Object sanitization.
    */
