@@ -1,7 +1,6 @@
 # RAML Sanitize
 
 [![Greenkeeper badge](https://badges.greenkeeper.io/mulesoft-labs/node-raml-sanitize.svg)](https://greenkeeper.io/)
-
 [![NPM version][npm-image]][npm-url]
 [![Build status][travis-image]][travis-url]
 [![Test coverage][coveralls-image]][coveralls-url]
@@ -87,7 +86,7 @@ Apache 2.0
 
 [npm-image]: https://img.shields.io/npm/v/raml-sanitize.svg?style=flat
 [npm-url]: https://npmjs.org/package/raml-sanitize
-[travis-image]: https://img.shields.io/travis/mulesoft/node-raml-sanitize.svg?style=flat
-[travis-url]: https://travis-ci.org/mulesoft/node-raml-sanitize
-[coveralls-image]: https://img.shields.io/coveralls/mulesoft/node-raml-sanitize.svg?style=flat
-[coveralls-url]: https://coveralls.io/r/mulesoft/node-raml-sanitize?branch=master
+[travis-image]: https://img.shields.io/travis/mulesoft-labs/node-raml-sanitize.svg?style=flat
+[travis-url]: https://travis-ci.org/mulesoft-labs/node-raml-sanitize
+[coveralls-image]: https://img.shields.io/coveralls/mulesoft-labs/node-raml-sanitize.svg?style=flat
+[coveralls-url]: https://coveralls.io/r/mulesoft-labs/node-raml-sanitize?branch=master
