@@ -347,7 +347,7 @@ var TESTS = [
     {
       param: { type: ['array'] }
     },
-    { param: ['foo' ]},
+    { param: ['foo'] },
     { param: ['foo'] }
   ],
   [
