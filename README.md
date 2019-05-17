@@ -1,9 +1,9 @@
 # RAML Sanitize
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/mulesoft-labs/node-raml-sanitize.svg)](https://greenkeeper.io/)
 [![NPM version][npm-image]][npm-url]
 [![Build status][travis-image]][travis-url]
 [![Test coverage][coveralls-image]][coveralls-url]
+[![Greenkeeper badge](https://badges.greenkeeper.io/mulesoft-labs/node-raml-sanitize.svg)](https://greenkeeper.io/)
 
 Strict sanitization of [RAML 0.8 named parameters](https://github.com/raml-org/raml-spec/blob/master/versions/raml-08/raml-08.md#named-parameters) and [RAML 1.0 built-in types](https://github.com/raml-org/raml-spec/blob/master/versions/raml-10/raml-10.md#built-in-types).
 
