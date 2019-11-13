@@ -1,3 +1,5 @@
+const wp = require('webapi-parser')
+
 /**
  * Check if a value is empty.
  *
@@ -88,8 +90,8 @@ function toSanitization (configs, rules, types) {
   configs = Array.isArray(configs) ? configs : [configs]
 
   // Map configurations into function sanitization chains.
-  var sanitizations = configs.map(function (config) {
-    var fns = []
+  const sanitizations = configs.map(function (config) {
+    const fns = []
 
     // Push type sanitization first.
     if (typeof types[config.type] === 'function') {
@@ -196,11 +198,11 @@ function toSanitization (configs, rules, types) {
    * @return {*}
    */
   return function (value, key, object) {
-    var result = value
+    let result = value
 
     // Iterate over each sanitization until one is not empty.
     sanitizations.some(function (sanitization) {
-      var sanitized = sanitization(value, key, object)
+      const sanitized = sanitization(value, key, object)
 
       // If the value is accepted, return it.
       if (sanitized != null) {
@@ -224,23 +226,21 @@ function toSanitization (configs, rules, types) {
  */
 module.exports = function () {
   /**
-   * Return a sanitization function based on the passed in schema.
+   * Return a sanitization function based on the passed shapes.
    *
-   * @param  {Object}   schema
+   * @param  {Array<AnyShape>} shapes
    * @return {Function}
    */
-  function sanitize (schema) {
-    if (!schema) {
-      return function () {
-        return {}
-      }
+  function sanitize (shapes) {
+    if (!shapes && shapes.length < 1) {
+      return () => { return {} }
     }
 
-    var sanitizations = {}
+    const sanitizations = {}
 
-    // Map each parameter in the schema to a validation function.
-    Object.keys(schema).forEach(function (param) {
-      sanitizations[param] = sanitize.rule(schema[param])
+    // Map each parameter in the shapes to a validation function.
+    Object.keys(shapes).forEach(function (param) {
+      sanitizations[param] = sanitize.rule(shapes[param])
     })
 
     /**
@@ -253,17 +253,17 @@ module.exports = function () {
       model = model || {}
 
       // Create a new model instance to sanitize without any extra properties.
-      var sanitized = {}
+      const sanitized = {}
 
       // Iterate the sanitized parameters to get a clean model.
       Object.keys(sanitizations).forEach(function (param) {
-        var value = model[param]
-        var sanitize = sanitizations[param]
+        const value = model[param]
+        const sanitize = sanitizations[param]
 
         if (Object.prototype.hasOwnProperty.call(model, param)) {
           sanitized[param] = sanitize(value, param, model)
         } else {
-          var sanitizedValue = sanitize(undefined, param, model)
+          const sanitizedValue = sanitize(undefined, param, model)
 
           // Only set non-null values on the model.
           if (sanitizedValue != null) {
