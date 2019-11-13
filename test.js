@@ -6,13 +6,20 @@ const dm = require('webapi-parser').model.domain
 
 const TYPES = {
   string: 'http://www.w3.org/2001/XMLSchema#string',
-  number: 'http://www.w3.org/2001/XMLSchema#number',
+  number: 'http://a.ml/vocabularies/shapes#number',
   integer: 'http://www.w3.org/2001/XMLSchema#integer',
   boolean: 'http://www.w3.org/2001/XMLSchema#boolean',
   date: 'http://www.w3.org/2001/XMLSchema#date',
   dateTime: 'http://www.w3.org/2001/XMLSchema#dateTime',
   dateTimeOnly: 'http://a.ml/vocabularies/shapes#dateTimeOnly'
 }
+
+const stringArrayUnion = new dm.UnionShape()
+  .withName('param')
+  .withAnyOf([
+    new dm.ScalarShape().withDataType(TYPES.string),
+    new dm.ArrayShape()
+  ])
 
 /**
  * An array of all the tests to execute. Tests are in the format of:
@@ -335,23 +342,17 @@ const TESTS = [
     { param: '123' }
   ],
   [
-    {
-      param: { type: ['string', 'array'] }
-    },
+    stringArrayUnion,
     { param: '123' },
     { param: '123' }
   ],
   [
-    {
-      param: { type: ['string', 'array'] }
-    },
+    stringArrayUnion,
     { param: 123 },
     { param: 123 }
   ],
   [
-    {
-      param: { type: ['string', 'array'] }
-    },
+    stringArrayUnion,
     { param: [123, 234] },
     { param: [123, 234] }
   ],
@@ -359,103 +360,89 @@ const TESTS = [
    * Object sanitization.
    */
   [
-    {
-      param: { type: 'object' }
-    },
+    new dm.NodeShape().withName('param'),
     { param: null },
     { param: null }
   ],
   [
-    {
-      param: { type: 'object' }
-    },
+    new dm.NodeShape().withName('param'),
     { param: '{}' },
     { param: {} }
   ],
   [
-    {
-      param: { type: 'object' }
-    },
+    new dm.NodeShape().withName('param'),
     { param: '{ "foo" :"bar"}' },
     { param: { foo: 'bar' } }
   ],
   [
-    {
-      param: { type: 'object' }
-    },
+    new dm.NodeShape().withName('param'),
     { param: '{"foo": 1 }' },
     { param: { foo: 1 } }
   ],
   [
-    {
-      param: { type: 'object' }
-    },
+    new dm.NodeShape().withName('param'),
     { param: '{"foo": true }' },
     { param: { foo: true } }
   ],
   [
-    {
-      param: { type: 'object' }
-    },
+    new dm.NodeShape().withName('param'),
     { param: '{"foo"}' },
     { param: '{"foo"}' }
   ],
   [
-    {
-      param: { type: 'object' }
-    },
+    new dm.NodeShape().withName('param'),
     { param: '{"foo" : 1, }' },
     { param: '{"foo" : 1, }' }
   ],
   /**
-   * Repeated values.
+   * Arrays.
    */
   [
-    {
-      param: { type: 'boolean' }
-    },
+    new dm.ArrayShape()
+      .withName('param')
+      .withItems(new dm.ScalarShape().withDataType(TYPES.boolean)),
     { param: [123, 456] },
     { param: [123, 456] }
   ],
   [
-    {
-      param: { type: 'integer', repeat: true }
-    },
+    new dm.ArrayShape()
+      .withName('param')
+      .withItems(new dm.ScalarShape().withDataType(TYPES.integer)),
     {},
     { param: [] }
   ],
   [
-    {
-      param: { type: 'integer', repeat: true }
-    },
+    new dm.ArrayShape()
+      .withName('param')
+      .withItems(new dm.ScalarShape().withDataType(TYPES.integer)),
     { param: '5' },
     { param: [5] }
   ],
   [
-    {
-      param: { type: 'number', repeat: true }
-    },
+    new dm.ArrayShape()
+      .withName('param')
+      .withItems(new dm.ScalarShape().withDataType(TYPES.number)),
     { param: '123' },
     { param: [123] }
   ],
   [
-    {
-      param: { type: 'number', repeat: true }
-    },
+    new dm.ArrayShape()
+      .withName('param')
+      .withItems(new dm.ScalarShape().withDataType(TYPES.number)),
     { param: ['123', 'abc'] },
     { param: ['123', 'abc'] }
   ],
   [
-    {
-      param: { type: 'boolean', repeat: true }
-    },
+    new dm.ArrayShape()
+      .withName('param')
+      .withItems(new dm.ScalarShape().withDataType(TYPES.boolean)),
     { param: ['0', '1', '2'] },
     { param: [false, true, true] }
   ],
   [
-    {
-      param: { type: 'string', repeat: true }
-    },
+    new dm.ArrayShape()
+      .withName('param')
+      .withItems(new dm.ScalarShape().withDataType(TYPES.string)),
     { param: 'abc123' },
     { param: ['abc123'] }
   ],
@@ -463,44 +450,50 @@ const TESTS = [
    * Default value sanitization.
    */
   [
-    {
-      param: { type: 'string', default: 'test' }
-    },
+    new dm.ScalarShape().withDataType(TYPES.string)
+      .withDefaultValue(new dm.ScalarNode('test', TYPES.string)),
     { param: 'abc' },
     { param: 'abc' }
   ],
   [
-    {
-      param: { type: 'string', default: 'test' }
-    },
+    new dm.ScalarShape().withDataType(TYPES.string)
+      .withDefaultValue(new dm.ScalarNode('test', TYPES.string)),
     { param: null },
     { param: 'test' }
   ],
   [
-    {
-      param: { type: 'string', default: 'test' }
-    },
+    new dm.ScalarShape().withDataType(TYPES.string)
+      .withDefaultValue(new dm.ScalarNode('test', TYPES.string)),
     {},
     { param: 'test' }
   ],
   [
-    {
-      param: { type: 'string', default: 'test', repeat: true }
-    },
+    new dm.ArrayShape()
+      .withName('param')
+      .withItems(new dm.ScalarShape().withDataType(TYPES.string))
+      .withDefaultValue(
+        new dm.ArrayNode().addMember(
+          new dm.ScalarNode('test', TYPES.string)
+        )
+      ),
     { param: null },
     { param: ['test'] }
   ],
   [
-    {
-      param: { type: 'integer', default: 123 }
-    },
+    new dm.ScalarShape().withName('param').withDataType(TYPES.integer)
+      .withDefaultValue(new dm.ScalarNode(123, TYPES.integer)),
     { param: null },
     { param: 123 }
   ],
   [
-    {
-      param: { type: 'integer', default: '123', repeat: true }
-    },
+    new dm.ArrayShape()
+      .withName('param')
+      .withItems(new dm.ScalarShape().withDataType(TYPES.integer))
+      .withDefaultValue(
+        new dm.ArrayNode().addMember(
+          new dm.ScalarNode(123, TYPES.integer)
+        )
+      ),
     { param: null },
     { param: [123] }
   ],
@@ -508,11 +501,23 @@ const TESTS = [
    * Multiple sanitizations.
    */
   [
-    {
-      username: { type: 'string' },
-      birthday: { type: 'date' },
-      luckyNumber: { type: 'integer' }
-    },
+    new dm.NodeShape().withProperties([
+      new dm.PropertyShape()
+        .withName('username')
+        .withRange(
+          new dm.ScalarShape().withName('username').withDataType(TYPES.string)
+        ),
+      new dm.PropertyShape()
+        .withName('birthday')
+        .withRange(
+          new dm.ScalarShape().withName('birthday').withDataType(TYPES.date)
+        ),
+      new dm.PropertyShape()
+        .withName('luckyNumber')
+        .withRange(
+          new dm.ScalarShape().withName('luckyNumber').withDataType(TYPES.integer)
+        )
+    ]),
     {
       username: 'blakeembrey',
       birthday: 'Mon, 23 Jun 2014 01:19:34 GMT',
@@ -528,16 +533,12 @@ const TESTS = [
    * Multiple type sanitizations.
    */
   [
-    {
-      param: [
-        {
-          type: 'integer'
-        },
-        {
-          type: 'string'
-        }
-      ]
-    },
+    new dm.UnionShape()
+      .withName('param')
+      .withAnyOf([
+        new dm.ScalarShape().withDataType(TYPES.integer),
+        new dm.ScalarShape().withDataType(TYPES.string)
+      ]),
     {
       param: '123'
     },
@@ -546,16 +547,12 @@ const TESTS = [
     }
   ],
   [
-    {
-      param: [
-        {
-          type: 'integer'
-        },
-        {
-          type: 'string'
-        }
-      ]
-    },
+    new dm.UnionShape()
+      .withName('param')
+      .withAnyOf([
+        new dm.ScalarShape().withDataType(TYPES.integer),
+        new dm.ScalarShape().withDataType(TYPES.string)
+      ]),
     {
       param: 'abc'
     },
