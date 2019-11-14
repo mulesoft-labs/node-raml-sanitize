@@ -1,4 +1,4 @@
-const wp = require('webapi-parser')
+const domain = require('webapi-parser').model.domain
 
 /**
  * Check if a value is empty.
@@ -228,19 +228,26 @@ module.exports = function () {
   /**
    * Return a sanitization function based on the passed shapes.
    *
-   * @param  {Array<AnyShape>} shapes
+   * @param  {Array<PropertyShape|Parameter>} elements
    * @return {Function}
    */
-  function sanitize (shapes) {
-    if (!shapes && shapes.length < 1) {
-      return () => { return {} }
+  function sanitize (elements) {
+    if (!elements && elements.length < 1) {
+      return function () {
+        return {}
+      }
     }
+    elements = Array.isArray(elements) ? elements : [elements]
+    let schema = {}
+    elements.forEach(el => {
+      schema = { ...schema, ...elementToSchema(el) }
+    })
 
     const sanitizations = {}
 
-    // Map each parameter in the shapes to a validation function.
-    Object.keys(shapes).forEach(function (param) {
-      sanitizations[param] = sanitize.rule(shapes[param])
+    // Map each parameter in the schema to a validation function.
+    Object.keys(schema).forEach(function (param) {
+      sanitizations[param] = sanitize.rule(schema[param])
     })
 
     /**
@@ -309,4 +316,64 @@ module.exports = function () {
   sanitize.RULES = {}
 
   return sanitize
+}
+
+/**
+ * Converts DomainElement instances to a sanitization schema.
+ * Passed elements should have an attached schemas as an AnyShape
+ * subclass instance.
+ *
+ * @type {PropertyShape|Parameter} element
+ * @return {Object} - Schema compatible with sanitization.
+ */
+function elementToSchema (element) {
+  const name = element.name.value()
+  const shape = element.schema || element.range
+  const data = {
+    name: name,
+    required: !!element.required.value() || element.minCount > 0,
+    type: getShapeType(shape)
+  }
+  if (shape.values && shape.values.length > 0) {
+    data.enum = shape.values.map(val => val.value.value())
+  }
+  const extraData = {
+    format: shape.format.option,
+    default: shape.defaultValueStr.option,
+    minimum: shape.minimum.option,
+    maximum: shape.maximum.option,
+    multipleOf: shape.multipleOf.option,
+    minLength: shape.minLength.option,
+    maxLength: shape.maxLength.option,
+    pattern: shape.pattern.option
+  }
+  Object.entries(extraData).forEach(([key, val]) => {
+    if (val !== null && val !== undefined) {
+      data[key] = val
+    }
+  })
+  const namedData = {}
+  namedData[data.name] = data
+  return namedData
+}
+
+/**
+ * Returns a one-word string representing a shape type.
+ *
+ * @param  {webapi-parser.AnyShape} shape
+ * @return  {string|Array<string>}
+ */
+function getShapeType (shape) {
+  if (shape instanceof domain.ArrayShape) {
+    return 'array'
+  }
+  if (shape instanceof domain.NodeShape) {
+    return 'object'
+  }
+  if (shape instanceof domain.UnionShape) {
+    return shape.anyOf.map(getShapeType)
+  }
+  if (shape instanceof domain.ScalarShape) {
+    return shape.dataType.value().split('#').pop()
+  }
 }
