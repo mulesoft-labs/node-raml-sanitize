@@ -100,13 +100,13 @@ function toSanitization (configs, rules, types) {
 
     // Iterate over the schema configuration and push sanitization functions
     // into the sanitization array.
-    Object.keys(config).filter(function (rule) {
-      return rule !== 'type' && rule !== 'repeat' && rule !== 'default'
-    }).forEach(function (rule) {
-      if (typeof rules[rule] === 'function') {
-        fns.push(rules[rule](config[rule], rule, config))
-      }
-    })
+    Object.keys(config)
+      .filter(rule => rule !== 'type' && rule !== 'default')
+      .forEach(rule => {
+        if (typeof rules[rule] === 'function') {
+          fns.push(rules[rule](config[rule], rule, config))
+        }
+      })
 
     /**
      * Sanitize a single value using the function chain. Breaks when any value
@@ -141,25 +141,25 @@ function toSanitization (configs, rules, types) {
       // Immediately return empty values with attempting to sanitize.
       if (isEmpty(value)) {
         // Fallback to providing the default value instead.
-        if (config.default != null) {
+        if (config.default !== undefined) {
           return sanitization(config.default, key, object)
         }
 
-        // Return an empty array for repeatable values.
-        return config.repeat && !config.required ? [] : value
+        // Return an empty array for array types.
+        return config.type === 'array' && !config.required ? [] : value
       }
 
-      // Support repeated parameters as arrays.
-      if (config.repeat) {
+      // Sanitize each element of an array.
+      if (config.type === 'array' && config.items) {
         // Turn the result into an array
         if (!Array.isArray(value)) {
           value = [value]
         }
+        const sanitizeItem = toSanitization(
+          config.items, sanitize.RULES, sanitize.TYPES)
 
         // Map every value to be sanitized into a new array.
-        value = value.map(function (value) {
-          return sanitize(value, key, object)
-        })
+        value = value.map(value => sanitizeItem(value, key, object))
 
         // If any of the values are empty, refuse the sanitization.
         return value.some(isEmpty) ? null : value
@@ -227,27 +227,24 @@ function toSanitization (configs, rules, types) {
 module.exports = function () {
   /**
    * Return a sanitization function based on the passed shapes.
+   * Sanitize a multiple parameters config.
    *
    * @param  {Array<PropertyShape|Parameter>} elements
    * @return {Function}
    */
   function sanitize (elements) {
-    if (!elements && elements.length < 1) {
+    if (!elements || elements.length < 1) {
       return function () {
         return {}
       }
     }
     elements = Array.isArray(elements) ? elements : [elements]
-    let schema = {}
-    elements.forEach(el => {
-      schema = { ...schema, ...elementToSchema(el) }
-    })
 
     const sanitizations = {}
 
     // Map each parameter in the schema to a validation function.
-    Object.keys(schema).forEach(function (param) {
-      sanitizations[param] = sanitize.rule(schema[param])
+    elements.forEach(el => {
+      sanitizations[el.name.value()] = sanitize.rule(el)
     })
 
     /**
@@ -286,10 +283,11 @@ module.exports = function () {
   /**
    * Sanitize a single parameter config.
    *
-   * @param  {Object}   config
+   * @param  {PropertyShape|Parameter} element
    * @return {Function}
    */
-  sanitize.rule = function rule (config) {
+  sanitize.rule = function rule (element) {
+    const config = elementToSchema(element)
     return toSanitization(config, sanitize.RULES, sanitize.TYPES)
   }
 
@@ -327,10 +325,9 @@ module.exports = function () {
  * @return {Object} - Schema compatible with sanitization.
  */
 function elementToSchema (element) {
-  const name = element.name.value()
   const shape = element.schema || element.range
   const data = {
-    name: name,
+    name: element.name.value(),
     required: !!element.required.value() || element.minCount > 0,
     type: getShapeType(shape)
   }
@@ -352,9 +349,10 @@ function elementToSchema (element) {
       data[key] = val
     }
   })
-  const namedData = {}
-  namedData[data.name] = data
-  return namedData
+  if (data.type === 'array' && shape.items) {
+    data.items = elementToSchema(shape.items)
+  }
+  return data
 }
 
 /**
