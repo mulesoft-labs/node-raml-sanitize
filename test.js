@@ -1,8 +1,9 @@
-/* global describe, it */
+/* global describe, it, before */
 const util = require('util')
 const expect = require('chai').expect
 const sanitize = require('./')()
-const domain = require('webapi-parser').model.domain
+const wp = require('webapi-parser')
+const domain = wp.model.domain
 
 const TYPES = {
   string: 'http://www.w3.org/2001/XMLSchema#string',
@@ -15,7 +16,9 @@ const TYPES = {
 }
 
 function asParam (shape) {
-  return new domain.Parameter().withSchema(shape)
+  return new domain.Parameter()
+    .withName('param')
+    .withSchema(shape)
 }
 
 /**
@@ -309,12 +312,14 @@ const TESTS = [
     { param: '["a", 1, tru]' }
   ],
   [
-    asParam(new domain.ArrayShape()),
+    asParam(new domain.ArrayShape()
+      .withItems(new domain.ScalarShape().withDataType(TYPES.integer))),
     { param: 123 },
     { param: [123] }
   ],
   [
-    asParam(new domain.ArrayShape()),
+    asParam(new domain.ArrayShape()
+      .withItems(new domain.ScalarShape().withDataType(TYPES.string))),
     { param: 'foo' },
     { param: ['foo'] }
   ],
@@ -324,7 +329,8 @@ const TESTS = [
     { param: ['foo'] }
   ],
   [
-    asParam(new domain.ArrayShape()),
+    asParam(new domain.ArrayShape()
+      .withItems(new domain.NodeShape())),
     { param: { foo: 'boo' } },
     { param: [{ foo: 'boo' }] }
   ],
@@ -420,13 +426,6 @@ const TESTS = [
     asParam(new domain.ArrayShape()
       .withName('param')
       .withItems(new domain.ScalarShape().withDataType(TYPES.integer))),
-    {},
-    { param: [] }
-  ],
-  [
-    asParam(new domain.ArrayShape()
-      .withName('param')
-      .withItems(new domain.ScalarShape().withDataType(TYPES.integer))),
     { param: '5' },
     { param: [5] }
   ],
@@ -470,19 +469,19 @@ const TESTS = [
    */
   [
     asParam(new domain.ScalarShape().withDataType(TYPES.string)
-      .withDefaultValue(new domain.ScalarNode('test', TYPES.string))),
+      .withDefaultStr('test')),
     { param: 'abc' },
     { param: 'abc' }
   ],
   [
     asParam(new domain.ScalarShape().withDataType(TYPES.string)
-      .withDefaultValue(new domain.ScalarNode('test', TYPES.string))),
+      .withDefaultStr('test')),
     { param: null },
     { param: 'test' }
   ],
   [
     asParam(new domain.ScalarShape().withDataType(TYPES.string)
-      .withDefaultValue(new domain.ScalarNode('test', TYPES.string))),
+      .withDefaultStr('test')),
     {},
     { param: 'test' }
   ],
@@ -490,17 +489,13 @@ const TESTS = [
     asParam(new domain.ArrayShape()
       .withName('param')
       .withItems(new domain.ScalarShape().withDataType(TYPES.string))
-      .withDefaultValue(
-        new domain.ArrayNode().addMember(
-          new domain.ScalarNode('test', TYPES.string)
-        )
-      )),
+      .withDefaultStr('["test"]')),
     { param: null },
     { param: ['test'] }
   ],
   [
     asParam(new domain.ScalarShape().withName('param').withDataType(TYPES.integer)
-      .withDefaultValue(new domain.ScalarNode(123, TYPES.integer))),
+      .withDefaultStr('123')),
     { param: null },
     { param: 123 }
   ],
@@ -508,11 +503,7 @@ const TESTS = [
     asParam(new domain.ArrayShape()
       .withName('param')
       .withItems(new domain.ScalarShape().withDataType(TYPES.integer))
-      .withDefaultValue(
-        new domain.ArrayNode().addMember(
-          new domain.ScalarNode(123, TYPES.integer)
-        )
-      )),
+      .withDefaultStr('[123]')),
     { param: null },
     { param: [123] }
   ],
@@ -582,18 +573,17 @@ const TESTS = [
 ]
 
 describe('raml-sanitize', function () {
+  before(async function () {
+    await wp.WebApiParser.init()
+  })
   /**
    * Run through each of the defined tests to generate the test suite.
    */
-  TESTS.forEach(([shape, object, output]) => {
-    const description = [
-      util.inspect(shape),
-      'should sanitize',
-      util.inspect(object)
-    ].join(' ')
-
+  TESTS.forEach(([param, object, output], i) => {
+    const description = `${i + 1}: should sanitize ${util.inspect(object)}` +
+      ` to ${util.inspect(output)}`
     it(description, function () {
-      expect(sanitize(shape)(object)).to.deep.equal(output)
+      expect(sanitize(param)(object)).to.deep.equal(output)
     })
   })
 })

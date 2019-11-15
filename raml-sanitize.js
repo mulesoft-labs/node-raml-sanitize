@@ -144,9 +144,7 @@ function toSanitization (configs, rules, types) {
         if (config.default !== undefined) {
           return sanitization(config.default, key, object)
         }
-
-        // Return an empty array for array types.
-        return config.type === 'array' && !config.required ? [] : value
+        return value
       }
 
       // Sanitize each element of an array.
@@ -155,35 +153,29 @@ function toSanitization (configs, rules, types) {
         if (!Array.isArray(value)) {
           value = [value]
         }
-        const sanitizeItem = toSanitization(
-          config.items, sanitize.RULES, sanitize.TYPES)
+        const sanitizeItem = toSanitization(config.items, rules, types)
 
         // Map every value to be sanitized into a new array.
-        value = value.map(value => sanitizeItem(value, key, object))
-
+        value = value.map(val => sanitizeItem(val, key, object))
         // If any of the values are empty, refuse the sanitization.
         return value.some(isEmpty) ? null : value
       }
 
-      // Support array inputs.
-      if (Array.isArray(value)) {
-        if (value.length > 1) {
-          return null
-        }
+      // // Support array inputs.
+      // if (Array.isArray(value)) {
+      //   if (value.length > 1) {
+      //     return null
+      //   }
 
-        value = value[0]
-      }
+      //   value = value[0]
+      // }
 
-      // Support RAML 1.0 array types for single values.
-      const isTypeAnArray = Array.isArray(config.type)
-      const hasSingleType = config.type.length === 1
-      const isTypeArrayValue = config.type[0] === 'array'
-      const isValueAnArray = Array.isArray(value)
-      const isSingleValueArrayType = isTypeAnArray && hasSingleType && isTypeArrayValue && !isValueAnArray
-
-      if (isSingleValueArrayType) {
-        return [value]
-      }
+      // // Support RAML 1.0 array types for single values.
+      // const isTypeAnArray = config.type === 'array'
+      // const isValueAnArray = Array.isArray(value)
+      // if (isTypeAnArray && !isValueAnArray) {
+      //   return [value]
+      // }
 
       return sanitize(value, key, object)
     }
@@ -303,7 +295,9 @@ module.exports = function () {
     boolean: toBoolean,
     array: toArray,
     object: toObject,
-    date: toDate
+    date: toDate,
+    dateTime: toDate,
+    dateTimeOnly: toDate
   }
 
   /**
@@ -325,24 +319,27 @@ module.exports = function () {
  * @return {Object} - Schema compatible with sanitization.
  */
 function elementToSchema (element) {
-  const shape = element.schema || element.range
+  const shape = element.schema || element.range || element
+  const required = (
+    (element.required && element.required.value()) ||
+    (element.minCount && element.minCount > 0))
   const data = {
     name: element.name.value(),
-    required: !!element.required.value() || element.minCount > 0,
+    required: !!required,
     type: getShapeType(shape)
   }
   if (shape.values && shape.values.length > 0) {
     data.enum = shape.values.map(val => val.value.value())
   }
   const extraData = {
-    format: shape.format.option,
-    default: shape.defaultValueStr.option,
-    minimum: shape.minimum.option,
-    maximum: shape.maximum.option,
-    multipleOf: shape.multipleOf.option,
-    minLength: shape.minLength.option,
-    maxLength: shape.maxLength.option,
-    pattern: shape.pattern.option
+    format: shape.format && shape.format.option,
+    default: shape.defaultValueStr && shape.defaultValueStr.option,
+    minimum: shape.minimum && shape.minimum.option,
+    maximum: shape.maximum && shape.maximum.option,
+    multipleOf: shape.multipleOf && shape.multipleOf.option,
+    minLength: shape.minLength && shape.minLength.option,
+    maxLength: shape.maxLength && shape.maxLength.option,
+    pattern: shape.pattern && shape.pattern.option
   }
   Object.entries(extraData).forEach(([key, val]) => {
     if (val !== null && val !== undefined) {
