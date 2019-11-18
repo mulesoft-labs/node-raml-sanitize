@@ -7,7 +7,7 @@ const domain = require('webapi-parser').model.domain
  * @return {Boolean}
  */
 function isEmpty (value) {
-  return value == null
+  return value === null || value === undefined
 }
 
 /**
@@ -94,9 +94,13 @@ function toSanitization (configs, rules, types) {
     const fns = []
 
     // Push type sanitization first.
-    if (typeof types[config.type] === 'function') {
-      fns.push(types[config.type])
-    }
+    const isUnion = Array.isArray(config.type)
+    const typesNames = isUnion ? config.type : [config.type]
+    typesNames.forEach(name => {
+      if (typeof types[name] === 'function') {
+        fns.push(types[name])
+      }
+    })
 
     // Iterate over the schema configuration and push sanitization functions
     // into the sanitization array.
@@ -119,13 +123,14 @@ function toSanitization (configs, rules, types) {
      */
     function sanitize (value, key, object) {
       // Iterate over each sanitization function and return a single value.
-      fns.every(function (fn) {
+      if (isUnion) {
+        const values = fns.map(fn => fn(value, key, object))
+        return values.filter(val => val !== null)[0] || null
+      }
+      fns.every(fn => {
         value = fn(value, key, object)
-
-        // Break when the value returns `null`.
-        return value != null
+        return value !== null
       })
-
       return value
     }
 
@@ -161,22 +166,6 @@ function toSanitization (configs, rules, types) {
         return value.some(isEmpty) ? null : value
       }
 
-      // // Support array inputs.
-      // if (Array.isArray(value)) {
-      //   if (value.length > 1) {
-      //     return null
-      //   }
-
-      //   value = value[0]
-      // }
-
-      // // Support RAML 1.0 array types for single values.
-      // const isTypeAnArray = config.type === 'array'
-      // const isValueAnArray = Array.isArray(value)
-      // if (isTypeAnArray && !isValueAnArray) {
-      //   return [value]
-      // }
-
       return sanitize(value, key, object)
     }
   })
@@ -197,7 +186,7 @@ function toSanitization (configs, rules, types) {
       const sanitized = sanitization(value, key, object)
 
       // If the value is accepted, return it.
-      if (sanitized != null) {
+      if (sanitized !== null) {
         // Assign the sanitized value to the result.
         result = sanitized
 
@@ -341,6 +330,9 @@ function elementToSchema (element) {
     maxLength: shape.maxLength && shape.maxLength.option,
     pattern: shape.pattern && shape.pattern.option
   }
+  try {
+    extraData.default = JSON.parse(extraData.default)
+  } catch (e) {}
   Object.entries(extraData).forEach(([key, val]) => {
     if (val !== null && val !== undefined) {
       data[key] = val

@@ -362,14 +362,14 @@ const TESTS = [
         new domain.ArrayShape()
       ])),
     { param: 123 },
-    { param: 123 }
+    { param: '123' }
   ],
   [
     asParam(new domain.UnionShape()
       .withName('param')
       .withAnyOf([
-        new domain.ScalarShape().withDataType(TYPES.string),
-        new domain.ArrayShape()
+        new domain.ArrayShape(),
+        new domain.ScalarShape().withDataType(TYPES.string)
       ])),
     { param: [123, 234] },
     { param: [123, 234] }
@@ -549,12 +549,8 @@ const TESTS = [
         new domain.ScalarShape().withDataType(TYPES.integer),
         new domain.ScalarShape().withDataType(TYPES.string)
       ])),
-    {
-      param: '123'
-    },
-    {
-      param: 123
-    }
+    { param: '123' },
+    { param: 123 }
   ],
   [
     asParam(new domain.UnionShape()
@@ -563,12 +559,8 @@ const TESTS = [
         new domain.ScalarShape().withDataType(TYPES.integer),
         new domain.ScalarShape().withDataType(TYPES.string)
       ])),
-    {
-      param: 'abc'
-    },
-    {
-      param: 'abc'
-    }
+    { param: 'abc' },
+    { param: 'abc' }
   ]
 ]
 
