@@ -1,5 +1,3 @@
-const domain = require('webapi-parser').model.domain
-
 /**
  * Check if a value is empty.
  *
@@ -351,16 +349,20 @@ function elementToSchema (element) {
  * @return  {string|Array<string>}
  */
 function getShapeType (shape) {
-  if (shape instanceof domain.ArrayShape) {
-    return 'array'
+  // ScalarShape
+  if (shape.dataType !== undefined) {
+    return shape.dataType.value().split('#').pop()
   }
-  if (shape instanceof domain.NodeShape) {
-    return 'object'
-  }
-  if (shape instanceof domain.UnionShape) {
+  // UnionShape
+  if (shape.anyOf !== undefined) {
     return shape.anyOf.map(getShapeType)
   }
-  if (shape instanceof domain.ScalarShape) {
-    return shape.dataType.value().split('#').pop()
+  // ArrayShape
+  if (shape.items !== undefined) {
+    return 'array'
+  }
+  // NodeShape
+  if (shape.properties !== undefined) {
+    return 'object'
   }
 }
