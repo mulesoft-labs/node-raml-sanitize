@@ -208,7 +208,7 @@ module.exports = function () {
    * Return a sanitization function based on the passed shapes.
    * Sanitize a multiple parameters config.
    *
-   * @param  {Array<PropertyShape|Parameter>} elements
+   * @param  {Array.<(webapi-parser.PropertyShape|webapi-parser.Parameter)>} elements
    * @return {Function}
    */
   function sanitize (elements) {
@@ -262,7 +262,7 @@ module.exports = function () {
   /**
    * Sanitize a single parameter config.
    *
-   * @param  {PropertyShape|Parameter} element
+   * @param  {(webapi-parser.PropertyShape|webapi-parser.Parameter)} element
    * @return {Function}
    */
   sanitize.rule = function rule (element) {
@@ -302,7 +302,7 @@ module.exports = function () {
  * Passed elements should have an attached schemas as an AnyShape
  * subclass instance.
  *
- * @type {PropertyShape|Parameter} element
+ * @type {(webapi-parser.PropertyShape|webapi-parser.Parameter)} element
  * @return {Object} - Schema compatible with sanitization.
  */
 function elementToSchema (element) {
@@ -346,7 +346,7 @@ function elementToSchema (element) {
  * Returns a one-word string representing a shape type.
  *
  * @param  {webapi-parser.AnyShape} shape
- * @return  {string|Array<string>}
+ * @return {string|Array<string>}
  */
 function getShapeType (shape) {
   // ScalarShape

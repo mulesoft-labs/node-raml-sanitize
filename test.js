@@ -19,6 +19,7 @@ function asParam (shape) {
   return new domain.Parameter()
     .withName('param')
     .withSchema(shape)
+    .withRequired(true)
 }
 
 /**
