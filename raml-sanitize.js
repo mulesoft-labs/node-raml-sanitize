@@ -149,25 +149,15 @@ function toSanitization (configs, rules, types) {
      */
     function sanitize (value, key, object) {
       // Iterate over each sanitization function and return a single value.
-      if (isUnion) {
-        fns.every(fn => {
-          try {
-            value = fn(value, key, object)
-            return false
-          } catch (e) {
-            return true
-          }
-        })
-      } else {
-        fns.every(fn => {
-          try {
-            value = fn(value, key, object)
-            return true
-          } catch (e) {
-            return false
-          }
-        })
+      function fnsRunner (fn) {
+        try {
+          value = fn(value, key, object)
+          return true
+        } catch (e) {
+          return false
+        }
       }
+      isUnion ? fns.some(fnsRunner) : fns.every(fnsRunner)
       return value
     }
 
