@@ -26,7 +26,10 @@ function toBoolean (value) {
  * @return {Number}
  */
 function toNumber (value) {
-  return isFinite(value) ? Number(value) : null
+  if (isFinite(value)) {
+    return Number(value)
+  }
+  throw new Error('toNumber: value is not finite')
 }
 
 /**
@@ -37,7 +40,10 @@ function toNumber (value) {
  * @return {Number}
  */
 function toInteger (value) {
-  return value % 1 === 0 ? Number(value) : null
+  if (value % 1 === 0) {
+    return Number(value)
+  }
+  throw new Error('toInteger: value is not a multiple of 1')
 }
 
 /**
@@ -47,7 +53,13 @@ function toInteger (value) {
  * @return {Date}
  */
 function toDate (value) {
-  return !isNaN(Date.parse(value)) ? new Date(value) : null
+  if (value.constructor === Date) {
+    return value
+  }
+  if (!isNaN(Date.parse(value))) {
+    return new Date(value)
+  }
+  throw new Error('toDate: value is not a parsable date')
 }
 
 /**
@@ -57,10 +69,18 @@ function toDate (value) {
  * @return {Array}
  */
 function toArray (value) {
+  if (Array.isArray(value)) {
+    return value
+  }
   try {
     value = JSON.parse(value)
-  } catch (e) {}
-  return Array.isArray(value) ? value : null
+  } catch (e) {
+    throw new Error(`toArray: ${e.toString()}`)
+  }
+  if (!Array.isArray(value)) {
+    throw new Error('toArray: parsed value is not an array')
+  }
+  return value
 }
 
 /**
@@ -70,10 +90,18 @@ function toArray (value) {
  * @return {Object}
  */
 function toObject (value) {
+  if (value.constructor === {}.constructor) {
+    return value
+  }
   try {
     value = JSON.parse(value)
-  } catch (e) {}
-  return value.constructor === {}.constructor ? value : null
+  } catch (e) {
+    throw new Error(`toObject: ${e.toString()}`)
+  }
+  if (value.constructor !== {}.constructor) {
+    throw new Error('toObject: parsed value is not an object')
+  }
+  return value
 }
 
 /**
@@ -122,13 +150,24 @@ function toSanitization (configs, rules, types) {
     function sanitize (value, key, object) {
       // Iterate over each sanitization function and return a single value.
       if (isUnion) {
-        const values = fns.map(fn => fn(value, key, object))
-        return values.filter(val => val !== null)[0] || null
+        fns.every(fn => {
+          try {
+            value = fn(value, key, object)
+            return false
+          } catch (e) {
+            return true
+          }
+        })
+      } else {
+        fns.every(fn => {
+          try {
+            value = fn(value, key, object)
+            return true
+          } catch (e) {
+            return false
+          }
+        })
       }
-      fns.every(fn => {
-        value = fn(value, key, object)
-        return value !== null
-      })
       return value
     }
 
@@ -181,17 +220,7 @@ function toSanitization (configs, rules, types) {
 
     // Iterate over each sanitization until one is not empty.
     sanitizations.some(function (sanitization) {
-      const sanitized = sanitization(value, key, object)
-
-      // If the value is accepted, return it.
-      if (sanitized !== null) {
-        // Assign the sanitized value to the result.
-        result = sanitized
-
-        return true
-      }
-
-      return false
+      result = sanitization(value, key, object)
     })
 
     return result
@@ -240,19 +269,11 @@ module.exports = function () {
 
       // Iterate the sanitized parameters to get a clean model.
       Object.keys(sanitizations).forEach(function (param) {
-        const value = model[param]
+        const value = Object.prototype.hasOwnProperty.call(model, param)
+          ? model[param]
+          : undefined
         const sanitize = sanitizations[param]
-
-        if (Object.prototype.hasOwnProperty.call(model, param)) {
-          sanitized[param] = sanitize(value, param, model)
-        } else {
-          const sanitizedValue = sanitize(undefined, param, model)
-
-          // Only set non-null values on the model.
-          if (sanitizedValue != null) {
-            sanitized[param] = sanitizedValue
-          }
-        }
+        sanitized[param] = sanitize(value, param, model)
       })
 
       return sanitized

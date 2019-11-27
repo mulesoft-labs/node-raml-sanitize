@@ -320,9 +320,21 @@ const TESTS = [
   ],
   [
     asParam(new domain.ArrayShape()
+      .withItems(new domain.ScalarShape().withDataType(TYPES.integer))),
+    { param: ['123', '123'] },
+    { param: [123, 123] }
+  ],
+  [
+    asParam(new domain.ArrayShape()
       .withItems(new domain.ScalarShape().withDataType(TYPES.string))),
     { param: 'foo' },
     { param: ['foo'] }
+  ],
+  [
+    asParam(new domain.ArrayShape()
+      .withItems(new domain.ScalarShape().withDataType(TYPES.boolean))),
+    { param: ['true', 'false'] },
+    { param: [true, false] }
   ],
   [
     asParam(new domain.ArrayShape()),
