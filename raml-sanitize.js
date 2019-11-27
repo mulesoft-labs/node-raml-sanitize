@@ -140,7 +140,7 @@ function toSanitization (configs, rules, types) {
 
     /**
      * Sanitize a single value using the function chain. Breaks when any value
-     * returns an empty value (`null` or `undefined`).
+     * sanitization throws an error.
      *
      * @param  {*}      value
      * @param  {String} key
@@ -251,22 +251,22 @@ module.exports = function () {
     /**
      * Execute the returned function with a model to return a sanitized object.
      *
-     * @param  {Object} model
+     * @param  {Object} input
      * @return {Object}
      */
-    return function (model) {
-      model = model || {}
+    return function (input) {
+      input = input || {}
 
-      // Create a new model instance to sanitize without any extra properties.
+      // Create a new instance to sanitize without any extra properties.
       const sanitized = {}
 
-      // Iterate the sanitized parameters to get a clean model.
+      // Iterate the sanitized parameters to get a clean input.
       Object.keys(sanitizations).forEach(function (param) {
-        const value = Object.prototype.hasOwnProperty.call(model, param)
-          ? model[param]
+        const value = Object.prototype.hasOwnProperty.call(input, param)
+          ? input[param]
           : undefined
         const sanitize = sanitizations[param]
-        sanitized[param] = sanitize(value, param, model)
+        sanitized[param] = sanitize(value, param, input)
       })
 
       return sanitized

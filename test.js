@@ -34,6 +34,11 @@ const TESTS = [
    */
   [
     asParam(new domain.ScalarShape().withName('param').withDataType(TYPES.string)),
+    { foo: 'hello' },
+    { param: undefined }
+  ],
+  [
+    asParam(new domain.ScalarShape().withName('param').withDataType(TYPES.string)),
     { param: null },
     { param: null }
   ],
