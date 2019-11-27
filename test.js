@@ -295,7 +295,7 @@ const TESTS = [
   [
     asParam(new domain.ArrayShape()),
     { param: '[a]' },
-    { param: '[a]' }
+    { param: ['[a]'] }
   ],
   [
     asParam(new domain.ArrayShape()),
@@ -310,7 +310,7 @@ const TESTS = [
   [
     asParam(new domain.ArrayShape()),
     { param: '["a", 1, tru]' },
-    { param: '["a", 1, tru]' }
+    { param: ['["a", 1, tru]'] }
   ],
   [
     asParam(new domain.ArrayShape()
@@ -334,6 +334,12 @@ const TESTS = [
     asParam(new domain.ArrayShape()
       .withItems(new domain.ScalarShape().withDataType(TYPES.boolean))),
     { param: ['true', 'false'] },
+    { param: [true, false] }
+  ],
+  [
+    asParam(new domain.ArrayShape()
+      .withItems(new domain.ScalarShape().withDataType(TYPES.boolean))),
+    { param: '[true, false]' },
     { param: [true, false] }
   ],
   [

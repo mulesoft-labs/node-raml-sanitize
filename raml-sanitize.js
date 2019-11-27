@@ -179,21 +179,24 @@ function toSanitization (configs, rules, types) {
         return value
       }
 
+      value = sanitize(value, key, object)
+
       // Sanitize each element of an array.
-      if (config.type === 'array' && config.items) {
+      if (config.type === 'array') {
         // Turn the result into an array
         if (!Array.isArray(value)) {
           value = [value]
         }
-        const sanitizeItem = toSanitization(config.items, rules, types)
+        if (config.items) {
+          const sanitizeItem = toSanitization(config.items, rules, types)
 
-        // Map every value to be sanitized into a new array.
-        value = value.map(val => sanitizeItem(val, key, object))
-        // If any of the values are empty, refuse the sanitization.
-        return value.some(isEmpty) ? null : value
+          // Map every value to be sanitized into a new array.
+          value = value.map(val => sanitizeItem(val, key, object))
+          // If any of the values are empty, refuse the sanitization.
+          value = value.some(isEmpty) ? null : value
+        }
       }
-
-      return sanitize(value, key, object)
+      return value
     }
   })
 
