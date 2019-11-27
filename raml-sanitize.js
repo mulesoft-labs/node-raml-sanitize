@@ -262,11 +262,12 @@ module.exports = function () {
 
       // Iterate the sanitized parameters to get a clean input.
       Object.keys(sanitizations).forEach(function (param) {
-        const value = Object.prototype.hasOwnProperty.call(input, param)
-          ? input[param]
-          : undefined
-        const sanitize = sanitizations[param]
-        sanitized[param] = sanitize(value, param, input)
+        const hasField = Object.prototype.hasOwnProperty.call(input, param)
+        const value = hasField ? input[param] : null
+        const sanValue = sanitizations[param](value, param, input)
+        if (hasField || sanValue !== null) {
+          sanitized[param] = sanValue
+        }
       })
 
       return sanitized
