@@ -532,6 +532,72 @@ const TESTS = [
     { param: [123] }
   ],
   /**
+   * Nested sanitization
+   */
+  [
+    [
+      new domain.PropertyShape()
+        .withName('user')
+        .withRange(
+          new domain.NodeShape().withName('param').withProperties([
+            new domain.PropertyShape()
+              .withName('name')
+              .withRange(
+                new domain.NodeShape().withName('name').withProperties([
+                  new domain.PropertyShape()
+                    .withName('nameGroup')
+                    .withRange(
+                      new domain.ScalarShape().withName('nameGroup').withDataType(TYPES.string)
+                    ),
+                  new domain.PropertyShape()
+                    .withName('nameId')
+                    .withRange(
+                      new domain.ScalarShape().withName('nameId').withDataType(TYPES.number)
+                    ),
+                  new domain.PropertyShape()
+                    .withName('createdAt')
+                    .withRange(
+                      new domain.ScalarShape().withName('createdAt').withDataType(TYPES.date)
+                    )
+                ])
+              ),
+            new domain.PropertyShape()
+              .withName('age')
+              .withRange(
+                new domain.ScalarShape().withName('age').withDataType(TYPES.number)
+              )
+          ])
+        ),
+      new domain.PropertyShape()
+        .withName('userId')
+        .withRange(
+          new domain.ScalarShape().withName('userId').withDataType(TYPES.number)
+        )
+    ],
+    {
+      user: {
+        name: {
+          nameGroup: 'common',
+          nameId: '87',
+          createdAt: 'Mon, 23 Jun 2014 01:19:34 GMT'
+        },
+        age: '65'
+      },
+      userId: '5'
+    },
+    {
+      user: {
+        name: {
+          nameGroup: 'common',
+          nameId: 87,
+          createdAt: new Date('Mon, 23 Jun 2014 01:19:34 GMT')
+        },
+        age: 65
+      },
+      userId: 5
+    }
+  ],
+  /**
    * Multiple sanitizations.
    */
   [

@@ -245,7 +245,11 @@ module.exports = function () {
 
     // Map each parameter in the schema to a validation function.
     elements.forEach(el => {
-      sanitizations[el.name.value()] = sanitize.rule(el)
+      const sch = getSchema(el)
+      const hasProperties = sch && sch.properties && sch.properties.length > 0
+      sanitizations[el.name.value()] = hasProperties
+        ? sanitize(sch.properties)
+        : sanitize.rule(el)
     })
 
     /**
@@ -264,7 +268,12 @@ module.exports = function () {
       Object.keys(sanitizations).forEach(function (param) {
         const hasField = Object.prototype.hasOwnProperty.call(input, param)
         const value = hasField ? input[param] : null
-        const sanValue = sanitizations[param](value, param, input)
+        let sanValue
+        if (value && value.constructor === Object) {
+          sanValue = sanitizations[param](value)
+        } else {
+          sanValue = sanitizations[param](value, param, input)
+        }
         if (hasField || sanValue !== null) {
           sanitized[param] = sanValue
         }
@@ -321,7 +330,7 @@ module.exports = function () {
  * @return {Object} - Schema compatible with sanitization.
  */
 function elementToSchema (element) {
-  const shape = element.schema || element.range || element
+  const shape = getSchema(element)
   const required = (
     (element.required && element.required.value()) ||
     (element.minCount && element.minCount > 0))
@@ -355,6 +364,16 @@ function elementToSchema (element) {
     data.items = elementToSchema(shape.items)
   }
   return data
+}
+
+/**
+ * Gets element schema.
+ *
+ * @type {(webapi-parser.PropertyShape|webapi-parser.Parameter)} element
+ * @return {webapi-parser.AnyShape} - Element schema
+ */
+function getSchema (element) {
+  return element.schema || element.range || element
 }
 
 /**
