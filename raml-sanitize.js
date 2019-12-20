@@ -268,12 +268,7 @@ module.exports = function () {
       Object.keys(sanitizations).forEach(function (param) {
         const hasField = Object.prototype.hasOwnProperty.call(input, param)
         const value = hasField ? input[param] : null
-        let sanValue
-        if (value && value.constructor === Object) {
-          sanValue = sanitizations[param](value)
-        } else {
-          sanValue = sanitizations[param](value, param, input)
-        }
+        const sanValue = sanitizations[param](value, param, input)
         if (hasField || sanValue !== null) {
           sanitized[param] = sanValue
         }
