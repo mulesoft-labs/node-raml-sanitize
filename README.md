@@ -9,7 +9,7 @@ Strict sanitization of [RAML 0.8 named parameters](https://github.com/raml-org/r
 
 ## Why?
 
-This module sanitizes values using the RAML parameter syntax. You should use this if you need to convert any request parameters (usually strings) into the corresponding JavaScript types. For example, form request bodies, query parameters and headers all have no concept of types. After running sanitization, you can use [raml-validate](https://github.com/mulesoft/node-raml-validate) to validate the strict values.
+This module sanitizes values using [webapi-parser](https://github.com/raml-org/webapi-parser) `Parameter`s and `PropertyShape`s. You should use this if you need to convert any request parameters (usually strings) into the corresponding JavaScript types. For example, form request bodies, query parameters and headers all have no concept of types. After running sanitization, you can use [raml-validate](https://github.com/mulesoft/node-raml-validate) to validate the strict values.
 
 ## Installation
 
@@ -21,38 +21,53 @@ npm install raml-sanitize --save
 
 The module exports a function that needs to be invoked to get a sanitization instance.
 
-```javascript
-var sanitize = require('raml-sanitize')();
+```js
+const wap = require('webapi-parser').WebApiParser
+const sanitize = require('raml-sanitize')()
 
-var user = sanitize({
-  username: {
-    type: 'string'
-  },
-  password: {
-    type: 'string'
-  },
-  birthday: {
-    type: 'date',
-    default: new Date()
+// returns Array<webapi-parser.PropertyShape>
+async function getProperties () {
+  const ramlStr = `
+    #%RAML 1.0
+    title: API with Types
+    types:
+      User:
+        type: object
+        properties:
+          username: string
+          password:  string
+          birthday:
+            type: date
+            default: Mon, 23 Jun 2014 01:19:34 GMT
+  `
+  const model = await wap.raml10.parse(ramlStr)
+  return model.declares[0].properties
+}
+
+async function main () {
+  // These could also be Array<webapi-parser.Parameter>
+  const properties = await getProperties()
+  const user = sanitize(properties)
+  const requestData = {
+    username: 'blakeembrey',
+    password: 'hunter2'
   }
-});
+  user(requestData)
+  // => { username: 'blakeembrey', password: 'hunter2', birthday: new Date('Mon, 23 Jun 2014 01:19:34 GMT') }
+}
 
-user({
-  username: 'blakeembrey',
-  password: 'hunter2'
-});
-// => { username: 'blakeembrey', password: 'hunter2', birthday: new Date() }
+main()
 ```
 
 **Module does not currently support [wild-card parameters](https://github.com/raml-org/raml-spec/blob/master/versions/raml-08/raml-08.md#headers) (RAML 0.8) and regular expression patterns in [property declaration](https://github.com/raml-org/raml-spec/blob/master/versions/raml-10/raml-10.md#property-declarations) (RAML 1.0)**
 
 ### Type sanitization
 
-The module comes with built-in type sanitization of `string`, `number`, `integer`, `array`, `object`, `date` and `boolean`. To add a new type sanitization, add a new property with the corresponding name to the `sanitize.TYPES` object.
+The module comes with built-in type sanitization of `string`, `number`, `integer`, `array`, `object`, `date` and `boolean` as well as nested data. To add a new type sanitization, add a new property with the corresponding name to the `sanitize.TYPES` object.
 
 ### Rule sanitization
 
-The module can be extended with rule sanitization by adding properties to the `sanitize.RULES` object. A few core rules are implemented by default and can not be overriden - `repeat`, `default` and `type`.
+The module can be extended with rule sanitization by adding properties to the `sanitize.RULES` object. A few core rules are implemented by default and can not be overriden - `default` and `type`.
 
 #### Empty values
 
@@ -62,15 +77,11 @@ Empty values are automatically allowed to pass through sanitization. The only va
 
 When the value is empty and a `default` value has been provided, it will return the default value instead.
 
-#### Repeated values (RAML 0.8)
-
-When the repeat flag is set to `true`, the return value will be an array. If the value is not an array, it will be wrapped in an array. If the value is empty, an empty array will be returned.
-
 ### Caveats
 
 #### Limitations with types (RAML 1.0)
 
-The module does not support neither [Type Expressions](https://github.com/raml-org/raml-spec/blob/master/versions/raml-10/raml-10.md#type-expressions) nor [Union Type](https://github.com/raml-org/raml-spec/blob/master/versions/raml-10/raml-10.md#union-type).
+The module does not support some [Type Expressions](https://github.com/raml-org/raml-spec/blob/master/versions/raml-10/raml-10.md#type-expressions) (bi-dimensional array `A[][]` and array of union `(A|B)[]`).
 
 #### Invalid Sanitization
 
