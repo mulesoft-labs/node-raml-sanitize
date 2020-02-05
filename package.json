@@ -29,7 +29,7 @@
     "mocha": "^6.2.2",
     "nyc": "^14.1.1",
     "standard": "^14.3.1",
-    "webapi-parser": "^0.5.0"
+    "webapi-parser": "^0.4.1"
   },
   "dependencies": {}
 }
