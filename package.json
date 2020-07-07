@@ -26,10 +26,10 @@
   "homepage": "https://github.com/mulesoft/node-raml-sanitize",
   "devDependencies": {
     "chai": "^4.2.0",
-    "webapi-parser": "^0.4.1",
-    "mocha": "^7.1.2",
-    "nyc": "^15.0.1",
-    "standard": "^14.3.3"
+    "mocha": "^8.0.1",
+    "nyc": "^15.1.0",
+    "standard": "^14.3.4",
+    "webapi-parser": "^0.4.1"
   },
   "dependencies": {}
 }
