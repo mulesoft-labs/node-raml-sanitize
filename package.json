@@ -1,6 +1,6 @@
 {
   "name": "raml-sanitize",
-  "version": "1.4.0",
+  "version": "2.0.0",
   "description": "Sanitization of RAML parameters into strict values",
   "main": "raml-sanitize.js",
   "scripts": {
